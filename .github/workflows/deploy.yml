@@ -16,6 +16,11 @@ concurrency:
 
 jobs:
   build-and-deploy:
+    # 👇 在这里添加 environment 配置（第20行左右）
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
