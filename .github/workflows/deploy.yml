@@ -32,10 +32,15 @@ jobs:
       - name: Build blog
         run: npm run build
 
+      - name: Copy dist contents to root (for user pages)
+        run: |
+          cp -r dist/* .
+          ls -la
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist
+          path: .
 
   deploy:
     environment:
