@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>文章标题 - Shiori Blog</title>
+  <title>计算机网络：深入理解TCP/IP协议栈 - Shiori Blog</title>
   <style>/*
  * Shiori Minimalist Theme
  * A clean, technical blog style with gray, white, beige, and black colors
@@ -558,50 +558,312 @@ body {
     <main class="main-content">
       <article class="post">
         <header class="post-header">
-          <h1 class="post-title">文章标题</h1>
+          <h1 class="post-title">计算机网络：深入理解TCP/IP协议栈</h1>
           <div class="post-meta">
             <time datetime="2025-12-26">2025-12-26</time>
             <span class="post-author">by WSyhkkl00</span>
-            <span class="post-reading-time">1 min read</span>
+            <span class="post-reading-time">4 min read</span>
           </div>
           
           <div class="post-categories">
-            <a href="/categories/技术分享/" class="category-tag">技术分享</a><a href="/categories/教程/" class="category-tag">教程</a>
+            <a href="/categories/计算机网络/" class="category-tag">计算机网络</a><a href="/categories/网络协议/" class="category-tag">网络协议</a>
           </div>
           
         </header>
 
         <div class="post-content">
-          <h1>文章标题</h1>
-<p>这里是文章的简介，会显示在首页列表中。</p>
-<!-- more -->
-
-<p>这里是正文内容，只有在点击进入文章页面后才会显示。</p>
-<h2>二级标题</h2>
-<h3>三级标题</h3>
-<p>普通段落文字...</p>
-<p><strong>粗体文字</strong><br><em>斜体文字</em></p>
-<h3>代码块</h3>
-<p>```javascript<br>function hello() {<br>  console.log(&quot;Hello, Shiori!&quot;);<br>}<br>```</p>
-<h3>列表</h3>
+          <h1>计算机网络：深入理解TCP/IP协议栈</h1>
+<p>TCP/IP协议栈是现代互联网的基石，理解它对于网络编程和系统设计至关重要。本文将全面解析TCP/IP协议栈的各个层次。</p>
+<h2>TCP/IP模型概览</h2>
+<p>TCP/IP模型分为四层，从下到上依次为：</p>
+<pre><code>┌─────────────────────────────────┐
+│   应用层 (Application Layer)     │  HTTP, FTP, SMTP, DNS...
+├─────────────────────────────────┤
+│   传输层 (Transport Layer)       │  TCP, UDP
+├─────────────────────────────────┤
+│   网络层 (Internet Layer)        │  IP, ICMP, IGMP
+├─────────────────────────────────┤
+│   链路层 (Link Layer)            │  Ethernet, Wi-Fi
+└─────────────────────────────────┘
+</code></pre>
+<h2>链路层（Link Layer）</h2>
+<p>链路层负责在直连的两个节点间传输数据帧。</p>
+<h3>以太网帧结构</h3>
+<pre><code>+----------+----------+--------------+------+----------+
+| 目标MAC  | 源MAC    | 以太网类型   | 数据 | FCS      |
+| 6字节    | 6字节    | 2字节        |      | 4字节    |
++----------+----------+--------------+------+----------+
+</code></pre>
+<h3>MAC地址</h3>
+<p>MAC地址是48位的物理地址，格式如：<code>00:1A:2B:3C:4D:5E</code></p>
 <ul>
-<li>项目一</li>
-<li>项目二</li>
-<li>项目三</li>
+<li>前24位：厂商识别码（OUI）</li>
+<li>后24位：厂商分配的序列号</li>
 </ul>
-<h3>引用</h3>
-<blockquote>
-<p>这是一段引用文字</p>
-</blockquote>
-<h3>链接</h3>
-<p><a href="https://github.com">Shiori GitHub</a></p>
+<h3>ARP协议</h3>
+<p>ARP（地址解析协议）用于将IP地址解析为MAC地址：</p>
+<pre><code>1. 主机A广播：&quot;谁是192.168.1.1？请告诉192.168.1.100&quot;
+2. 主机B响应：&quot;我是192.168.1.1，我的MAC是AA:BB:CC:DD:EE:FF&quot;
+</code></pre>
+<h2>网络层（Internet Layer）</h2>
+<p>网络层负责数据包的路由和转发。</p>
+<h3>IP协议</h3>
+<p>IP数据报头部结构（IPv4）：</p>
+<pre><code> 0               16                             31
+ +----------------+-----------------------------+
+ |版本|头长度|   服务类型   |       总长度         |
+ +-------+-------+-------------+-----------------+
+ |       标识符        |标志|  片偏移           |
+ +---------------------+----------+--------------+
+ |  TTL  |  协议  |      头部校验和            |
+ +-------+-------+-----------------------------+
+ |                  源IP地址                   |
+ |                                               |
+ +---------------------+-------------------------+
+ |                目标IP地址                    |
+ |                                               |
+ +---------------------+-------------------------+
+</code></pre>
+<h3>ICMP协议</h3>
+<p>ICMP用于网络诊断，ping命令就使用了ICMP：</p>
+<pre><code class="language-bash">$ ping google.com
+PING google.com (142.250.185.46): 56 data bytes
+64 bytes from 142.250.185.46: icmp_seq=0 ttl=117 time=14.2 ms
+</code></pre>
+<h3>路由选择</h3>
+<p>路由器根据路由表决定数据包的转发路径：</p>
+<pre><code>目标网络          子网掩码           网关
+192.168.1.0     255.255.255.0     0.0.0.0
+0.0.0.0         0.0.0.0           192.168.1.1
+</code></pre>
+<h2>传输层（Transport Layer）</h2>
+<p>传输层提供端到端的通信服务。</p>
+<h3>TCP协议</h3>
+<p>TCP是可靠的、面向连接的传输协议。</p>
+<h4>TCP头部结构</h4>
+<pre><code> 0               16                              31
+ +--------------------------+--------------------+
+ |      源端口号             |    目标端口号      |
+ +--------------------------+--------------------+
+ |                    序列号                      |
+ +------------------------------------------------+
+ |                    确认号                      |
+ +------+-----+-----+------+--------------------+
+ |头长度| 保留 |标志 |  窗口大小              |
+ +------+-----+-----+--------------------------+
+ |        校验和          |      紧急指针        |
+ +--------------------------+--------------------+
+</code></pre>
+<h4>TCP三次握手</h4>
+<pre><code>客户端                                    服务器
+   |                                       |
+   |         SYN, seq=x                    |
+   |--------------------------------------&gt;|
+   |                                       |
+   |    SYN+ACK, seq=y, ack=x+1            |
+   |&lt;--------------------------------------|
+   |                                       |
+   |    ACK, seq=x+1, ack=y+1              |
+   |--------------------------------------&gt;|
+   |                                       |
+   |           连接建立                      |
+</code></pre>
+<p>为什么需要三次握手？</p>
+<ul>
+<li>防止失效的连接报文段突然又传送到服务端</li>
+<li>同步双方的初始序列号</li>
+</ul>
+<h4>TCP四次挥手</h4>
+<pre><code>客户端                                    服务器
+   |                                       |
+   |            FIN, seq=u                 |
+   |--------------------------------------&gt;|
+   |         ACK, seq=v, ack=u+1           |
+   |&lt;--------------------------------------|
+   |                                       |
+   |         FIN, seq=w, ack=u+1           |
+   |&lt;--------------------------------------|
+   |    ACK, seq=u+1, ack=w+1              |
+   |--------------------------------------&gt;|
+   |                                       |
+   |           连接关闭                      |
+</code></pre>
+<h4>TCP流量控制</h4>
+<p>使用<strong>滑动窗口</strong>机制实现流量控制：</p>
+<pre><code>发送窗口：
+[已确认] [已发送未确认] [可发送] [不可发送]
+  |----------|----------|-----------|
+    1字节      3字节        4字节
+</code></pre>
+<h3>UDP协议</h3>
+<p>UDP是无连接的、不可靠的传输协议，但效率高。</p>
+<h4>UDP头部结构</h4>
+<pre><code> 0               16                              31
+ +--------------------------+--------------------+
+ |      源端口号             |    目标端口号      |
+ +--------------------------+--------------------+
+ |        长度              |      校验和        |
+ +--------------------------+--------------------+
+</code></pre>
+<h4>TCP vs UDP</h4>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>TCP</th>
+<th>UDP</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>连接性</td>
+<td>面向连接</td>
+<td>无连接</td>
+</tr>
+<tr>
+<td>可靠性</td>
+<td>可靠传输</td>
+<td>不可靠</td>
+</tr>
+<tr>
+<td>效率</td>
+<td>较低（头部开销大）</td>
+<td>高</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>文件传输、邮件</td>
+<td>视频流、游戏</td>
+</tr>
+</tbody></table>
+<h2>应用层（Application Layer）</h2>
+<p>应用层直接为用户的应用程序提供服务。</p>
+<h3>HTTP协议</h3>
+<p>HTTP请求格式：</p>
+<pre><code>GET /index.html HTTP/1.1
+Host: www.example.com
+User-Agent: Mozilla/5.0
+Accept: text/html
+</code></pre>
+<p>HTTP响应格式：</p>
+<pre><code>HTTP/1.1 200 OK
+Content-Type: text/html
+Content-Length: 1234
+
+&lt;html&gt;
+&lt;body&gt;
+&lt;h1&gt;Hello, World!&lt;/h1&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<h3>DNS协议</h3>
+<p>DNS将域名解析为IP地址：</p>
+<pre><code>查询过程：
+1. 客户端 -&gt; 本地DNS服务器：&quot;www.google.com的IP？&quot;
+2. 本地DNS -&gt; 根域名服务器：&quot;.的DNS服务器IP？&quot;
+3. 本地DNS -&gt; 顶级域名服务器：&quot;.com的DNS服务器IP？&quot;
+4. 本地DNS -&gt; 权威域名服务器：&quot;google.com的DNS服务器IP？&quot;
+5. 本地DNS -&gt; 客户端：返回解析结果
+</code></pre>
+<h2>Socket编程</h2>
+<p>Socket是网络编程的基础API。</p>
+<h3>TCP服务器示例（Python）</h3>
+<pre><code class="language-python">import socket
+
+# 创建socket
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# 绑定地址和端口
+server_socket.bind((&#39;0.0.0.0&#39;, 8080))
+
+# 监听连接
+server_socket.listen(5)
+
+while True:
+    # 接受连接
+    client_socket, address = server_socket.accept()
+    print(f&quot;Connection from {address}&quot;)
+
+    # 接收数据
+    data = client_socket.recv(1024)
+    print(f&quot;Received: {data.decode()}&quot;)
+
+    # 发送响应
+    client_socket.send(b&quot;Hello, Client!&quot;)
+
+    # 关闭连接
+    client_socket.close()
+</code></pre>
+<h3>TCP客户端示例（Python）</h3>
+<pre><code class="language-python">import socket
+
+# 创建socket
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# 连接服务器
+client_socket.connect((&#39;127.0.0.1&#39;, 8080))
+
+# 发送数据
+client_socket.send(b&quot;Hello, Server!&quot;)
+
+# 接收响应
+data = client_socket.recv(1024)
+print(f&quot;Received: {data.decode()}&quot;)
+
+# 关闭连接
+client_socket.close()
+</code></pre>
+<h2>性能优化</h2>
+<h3>TCP优化</h3>
+<ol>
+<li><strong>启用Nagle算法</strong>：减少小包发送</li>
+<li><strong>调整TCP窗口大小</strong>：提高吞吐量</li>
+<li><strong>启用TCP Fast Open</strong>：减少连接延迟</li>
+</ol>
+<pre><code class="language-bash"># sysctl配置示例
+net.ipv4.tcp_window_scaling = 1
+net.ipv4.tcp_rmem = 4096 87380 16777216
+net.ipv4.tcp_wmem = 4096 65536 16777216
+</code></pre>
+<h3>网络性能监控</h3>
+<pre><code class="language-bash"># 查看网络连接
+netstat -ant
+
+# 测试网络延迟
+ping -c 4 google.com
+
+# 测试带宽
+iperf -s  # 服务器端
+iperf -c &lt;server_ip&gt;  # 客户端
+</code></pre>
+<h2>常见问题</h2>
+<h3>TIME_WAIT状态</h3>
+<p>大量TIME_WAIT连接会占用系统资源：</p>
+<pre><code class="language-bash"># 查看TIME_WAIT连接
+netstat -ant | grep TIME_WAIT | wc -l
+
+# 快速复用TIME_WAIT socket
+echo &quot;1&quot; &gt; /proc/sys/net/ipv4/tcp_tw_reuse
+</code></pre>
+<h3>连接队列溢出</h3>
+<pre><code class="language-bash"># 增加连接队列
+echo &quot;1024&quot; &gt; /proc/sys/net/core/somaxconn
+</code></pre>
+<h2>总结</h2>
+<p>TCP/IP协议栈是分层设计的：</p>
+<ul>
+<li>链路层：负责物理传输</li>
+<li>网络层：负责路由寻址</li>
+<li>传输层：提供端到端服务</li>
+<li>应用层：面向用户应用</li>
+</ul>
+<p>理解每一层的作用和协议，对于网络编程和系统开发至关重要。</p>
 
         </div>
 
         
         <footer class="post-footer">
           <div class="post-tags">
-            <a href="/tags/javascript/" class="tag">#javascript</a><a href="/tags/nodejs/" class="tag">#nodejs</a><a href="/tags/前端开发/" class="tag">#前端开发</a>
+            <a href="/tags/TCP/IP/" class="tag">#TCP/IP</a><a href="/tags/网络编程/" class="tag">#网络编程</a><a href="/tags/协议栈/" class="tag">#协议栈</a><a href="/tags/Socket/" class="tag">#Socket</a>
           </div>
         </footer>
         

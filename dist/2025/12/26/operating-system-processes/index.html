@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tag: 操作系统 - Shiori Blog</title>
+  <title>操作系统核心概念：进程与线程详解 - Shiori Blog</title>
   <style>/*
  * Shiori Minimalist Theme
  * A clean, technical blog style with gray, white, beige, and black colors
@@ -542,10 +542,11 @@ body {
 }
 </style>
 </head>
-<body class="tag-page">
+<body class="post-page">
   <div class="container">
     <header class="site-header">
       <h1 class="site-title"><a href="/">Shiori Blog</a></h1>
+      <p class="site-subtitle">A minimalist technical blog</p>
       <nav class="site-nav">
         <a href="/">Home</a>
         <a href="/archives/">Archives</a>
@@ -555,21 +556,199 @@ body {
     </header>
 
     <main class="main-content">
-      <h1>Tag: 操作系统</h1>
-      <div class="posts-list">
+      <article class="post">
+        <header class="post-header">
+          <h1 class="post-title">操作系统核心概念：进程与线程详解</h1>
+          <div class="post-meta">
+            <time datetime="2025-12-26">2025-12-26</time>
+            <span class="post-author">by WSyhkkl00</span>
+            <span class="post-reading-time">2 min read</span>
+          </div>
+          
+          <div class="post-categories">
+            <a href="/categories/操作系统/" class="category-tag">操作系统</a><a href="/categories/计算机科学/" class="category-tag">计算机科学</a>
+          </div>
+          
+        </header>
+
+        <div class="post-content">
+          <h1>操作系统核心概念：进程与线程详解</h1>
+<p>进程和线程是操作系统中最重要的两个概念，理解它们的区别和联系对于成为一名优秀的程序员至关重要。本文将深入探讨这两个核心概念。</p>
+<h2>什么是进程？</h2>
+<p>进程是操作系统资源分配的基本单位，是程序在执行过程中的一个实例。每个进程都有自己独立的内存空间、文件描述符、堆栈等资源。</p>
+<h3>进程的特性</h3>
+<ul>
+<li><strong>独立性</strong>：每个进程都有自己独立的地址空间，进程间通信需要特殊的机制（IPC）</li>
+<li><strong>动态性</strong>：进程是程序的一次执行过程，具有生命周期</li>
+<li><strong>并发性</strong>：多个进程可以同时存在于系统中，并发执行</li>
+<li><strong>结构性</strong>：进程由程序段、数据段和进程控制块（PCB）组成</li>
+</ul>
+<h3>进程的状态</h3>
+<pre><code class="language-mermaid">graph LR
+    A[就绪] --&gt;|调度| B[运行]
+    B --&gt;|时间片用完| A
+    B --&gt;|I/O请求| C[阻塞]
+    C --&gt;|I/O完成| A
+    B --&gt;|完成| D[终止]
+</code></pre>
+<ol>
+<li><strong>就绪状态</strong>：进程已获得除CPU外的所有资源</li>
+<li><strong>运行状态</strong>：进程正在CPU上执行</li>
+<li><strong>阻塞状态</strong>：进程等待某个事件发生</li>
+</ol>
+<h2>什么是线程？</h2>
+<p>线程是CPU调度的基本单位，是进程中的一个执行路径。同一进程内的多个线程共享该进程的资源。</p>
+<h3>线程 vs 进程</h3>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>进程</th>
+<th>线程</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>资源拥有</td>
+<td>独立地址空间</td>
+<td>共享进程资源</td>
+</tr>
+<tr>
+<td>通信方式</td>
+<td>IPC（管道、消息队列等）</td>
+<td>共享内存</td>
+</tr>
+<tr>
+<td>上下文切换</td>
+<td>慢（需要切换地址空间）</td>
+<td>快</td>
+</tr>
+<tr>
+<td>创建销毁开销</td>
+<td>大</td>
+<td>小</td>
+</tr>
+<tr>
+<td>数据共享</td>
+<td>困难</td>
+<td>容易</td>
+</tr>
+</tbody></table>
+<h2>进程间通信（IPC）</h2>
+<p>由于进程间内存独立，需要特殊机制进行通信：</p>
+<h3>1. 管道（Pipe）</h3>
+<pre><code class="language-c">// 匿名管道示例
+#include &lt;unistd.h&gt;
+int pipefd[2];
+pipe(pipefd);  // 创建管道
+// pipefd[0] 用于读，pipefd[1] 用于写
+</code></pre>
+<h3>2. 消息队列</h3>
+<p>消息队列是保存在内核中的消息链表，有权限的进程可以向队列中添加消息，被赋予读权限的进程则可以从队列中读取消息。</p>
+<h3>3. 共享内存</h3>
+<p>共享内存是最快的IPC方式，多个进程将同一块物理内存映射到各自的虚拟地址空间。</p>
+<pre><code class="language-c">// 共享内存示例
+#include &lt;sys/shm.h&gt;
+int shmid = shmget(key, size, IPC_CREAT | 0666);
+char *shm = shmat(shmid, NULL, 0);
+</code></pre>
+<h3>4. 信号量</h3>
+<p>信号量本质上是一个计数器，用于控制多个进程对共享资源的访问。</p>
+<h2>线程同步</h2>
+<p>多线程编程中，必须考虑线程安全问题：</p>
+<h3>1. 互斥锁（Mutex）</h3>
+<pre><code class="language-python">import threading
+
+lock = threading.Lock()
+
+def critical_section():
+    lock.acquire()
+    try:
+        # 临界区代码
+        pass
+    finally:
+        lock.release()
+</code></pre>
+<h3>2. 信号量（Semaphore）</h3>
+<pre><code class="language-python">import threading
+
+semaphore = threading.Semaphore(3)  # 最多3个线程同时访问
+
+def access_resource():
+    with semaphore:
+        # 访问共享资源
+        pass
+</code></pre>
+<h3>3. 条件变量（Condition）</h3>
+<pre><code class="language-python">import threading
+
+condition = threading.Condition()
+
+def consumer():
+    with condition:
+        while not item_available:
+            condition.wait()
+        # 消费物品
+        condition.notify()
+
+def producer():
+    with condition:
+        # 生产物品
+        condition.notify()
+</code></pre>
+<h2>进程调度算法</h2>
+<p>操作系统需要决定哪个进程在何时运行：</p>
+<h3>1. 先来先服务（FCFS）</h3>
+<p>最简单的调度算法，按进程到达的顺序进行调度。</p>
+<h3>2. 短作业优先（SJF）</h3>
+<p>选择估计运行时间最短的进程优先执行。</p>
+<h3>3. 时间片轮转（Round Robin）</h3>
+<p>每个进程被分配一个时间片，时间片用完后被剥夺CPU。</p>
+<h3>4. 优先级调度</h3>
+<p>每个进程分配一个优先级，优先级高的进程优先执行。</p>
+<h2>实践建议</h2>
+<h3>何时使用多进程？</h3>
+<ul>
+<li>CPU密集型任务</li>
+<li>需要隔离性的场景</li>
+<li>需要充分利用多核CPU</li>
+</ul>
+<h3>何时使用多线程？</h3>
+<ul>
+<li>I/O密集型任务</li>
+<li>需要共享大量数据</li>
+<li>需要快速响应</li>
+</ul>
+<h3>性能优化技巧</h3>
+<ol>
+<li><strong>避免过度同步</strong>：减少锁的粒度和持有时间</li>
+<li><strong>使用线程池</strong>：避免频繁创建销毁线程</li>
+<li><strong>考虑无锁编程</strong>：使用原子操作和CAS</li>
+<li><strong>合理设置进程/线程数</strong>：通常设置为CPU核心数的1-2倍</li>
+</ol>
+<h2>总结</h2>
+<ul>
+<li>进程是资源分配的单位，线程是CPU调度的单位</li>
+<li>进程间通信需要特殊机制，线程间可以直接共享内存</li>
+<li>多进程适合CPU密集型，多线程适合I/O密集型</li>
+<li>合理使用同步机制避免竞态条件</li>
+</ul>
+<p>理解并正确使用进程和线程，是编写高效并发程序的基础。</p>
+
+        </div>
+
         
-      <article class="post-item">
-        <h2><a href="/2025/12/26/operating-system-processes/">操作系统核心概念：进程与线程详解</a></h2>
-        <time>2025-12-26</time>
+        <footer class="post-footer">
+          <div class="post-tags">
+            <a href="/tags/操作系统/" class="tag">#操作系统</a><a href="/tags/进程管理/" class="tag">#进程管理</a><a href="/tags/多线程/" class="tag">#多线程</a><a href="/tags/并发编程/" class="tag">#并发编程</a>
+          </div>
+        </footer>
+        
       </article>
-    
-      <article class="post-item">
-        <h2><a href="/2024/11/24/This-is-a-test-document/">Freertos源码学习日志</a></h2>
-        <time>2024-11-24</time>
-      </article>
-    
-      </div>
     </main>
+
+    <footer class="site-footer">
+      <p>&copy; WSyhkkl00 - Powered by Shiori</p>
+    </footer>
   </div>
 </body>
 </html>

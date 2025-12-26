@@ -561,20 +561,10 @@ body {
           <h1 class="post-title">Freertos源码学习日志</h1>
           <div class="post-meta">
             <time datetime="2024-11-24">2024-11-24</time>
-            {% if page.author %}
             <span class="post-author">by WSyhkkl00</span>
-            {% endif %}
-            {% if page.readingTime %}
             <span class="post-reading-time">2 min read</span>
-            {% endif %}
           </div>
-          {% if page.categories %}
-          <div class="post-categories">
-            {% for category in page.categories %}
-            <a href="/categories//" class="category-tag"></a>
-            {% endfor %}
-          </div>
-          {% endif %}
+          
         </header>
 
         <div class="post-content">
@@ -760,15 +750,13 @@ int main() {
 
         </div>
 
-        {% if page.tags %}
+        
         <footer class="post-footer">
           <div class="post-tags">
-            {% for tag in page.tags %}
-            <a href="/tags//" class="tag">#</a>
-            {% endfor %}
+            <a href="/tags/操作系统/" class="tag">#操作系统</a><a href="/tags/嵌入式原理/" class="tag">#嵌入式原理</a>
           </div>
         </footer>
-        {% endif %}
+        
       </article>
     </main>
 

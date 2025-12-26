@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>自动控制原理：PID控制器详解 - Shiori Blog</title>
+  <style>/*
+ * Shiori Minimalist Theme
+ * A clean, technical blog style with gray, white, beige, and black colors
+ */
+
+/* CSS Variables - Color Palette */
+:root {
+  --bg-primary: #FAFAF9;      /* 米白色 - 主背景 */
+  --bg-secondary: #FFFFFF;     /* 纯白色 - 卡片/内容背景 */
+  --bg-tertiary: #F5F5F4;      /* 浅灰 - 次要背景 */
+
+  --text-primary: #1C1917;     /* 深黑色 - 主要文字 */
+  --text-secondary: #57534E;   /* 灰色 - 次要文字 */
+  --text-tertiary: #A8A29E;    /* 浅灰 - 辅助文字 */
+
+  --accent: #292524;           /* 强调色 - 深灰黑 */
+  --accent-light: #78716C;     /* 浅强调色 */
+
+  --border: #E7E5E4;           /* 边框灰 */
+  --border-light: #F5F5F4;     /* 浅边框 */
+
+  --code-bg: #1C1917;          /* 代码背景深色 */
+  --code-text: #E7E5E4;        /* 代码文字浅色 */
+
+  --shadow: rgba(0, 0, 0, 0.05);
+  --shadow-hover: rgba(0, 0, 0, 0.1);
+
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
+
+/* Reset & Base Styles */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.7;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Container */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
+  width: 100%;
+}
+
+/* Site Header */
+.site-header {
+  padding: var(--spacing-2xl) 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.site-title {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--spacing-xs);
+}
+
+.site-title a {
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.site-title a:hover {
+  opacity: 0.7;
+}
+
+.site-subtitle {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  font-weight: 400;
+  margin-bottom: var(--spacing-md);
+}
+
+/* Navigation */
+.site-nav {
+  display: flex;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+.site-nav a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.2s;
+  position: relative;
+}
+
+.site-nav a:hover {
+  color: var(--text-primary);
+}
+
+.site-nav a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--accent);
+  transition: width 0.2s;
+}
+
+.site-nav a:hover::after {
+  width: 100%;
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  padding-bottom: var(--spacing-2xl);
+}
+
+/* Posts List */
+.posts-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.post-item {
+  padding: var(--spacing-xl) 0;
+  border-bottom: 1px solid var(--border);
+  transition: border-color 0.2s;
+}
+
+.post-item:hover {
+  border-color: var(--accent);
+}
+
+.post-item-header {
+  margin-bottom: var(--spacing-md);
+}
+
+.post-item-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-xs);
+  letter-spacing: -0.01em;
+}
+
+.post-item-title a {
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.post-item-title a:hover {
+  color: var(--text-secondary);
+}
+
+.post-item-date {
+  color: var(--text-tertiary);
+  font-size: 0.9rem;
+  font-family: "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.post-item-excerpt {
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-md);
+  line-height: 1.6;
+}
+
+.read-more {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.read-more:hover {
+  color: var(--text-primary);
+}
+
+/* Single Post */
+.post {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.post-header {
+  margin-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--border);
+}
+
+.post-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-bottom: var(--spacing-md);
+}
+
+.post-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  color: var(--text-tertiary);
+  font-size: 0.9rem;
+  font-family: "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.post-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.category-tag {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.category-tag:hover {
+  background-color: var(--border);
+}
+
+.post-content {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.post-content h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-top: var(--spacing-2xl);
+  margin-bottom: var(--spacing-md);
+  letter-spacing: -0.01em;
+}
+
+.post-content h3 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-top: var(--spacing-xl);
+  margin-bottom: var(--spacing-sm);
+}
+
+.post-content p {
+  margin-bottom: var(--spacing-md);
+}
+
+.post-content a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.post-content a:hover {
+  border-bottom-color: var(--accent);
+}
+
+.post-content ul,
+.post-content ol {
+  margin-bottom: var(--spacing-md);
+  padding-left: var(--spacing-xl);
+}
+
+.post-content li {
+  margin-bottom: var(--spacing-xs);
+}
+
+.post-content blockquote {
+  border-left: 4px solid var(--accent);
+  padding-left: var(--spacing-lg);
+  margin: var(--spacing-lg) 0;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Code Blocks */
+.post-content pre {
+  background-color: var(--code-bg);
+  color: var(--code-text);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  margin-bottom: var(--spacing-lg);
+}
+
+.post-content code {
+  font-family: "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.9em;
+}
+
+.post-content :not(pre) > code {
+  background-color: var(--bg-tertiary);
+  color: var(--accent);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+}
+
+/* Tables */
+.post-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--spacing-lg);
+}
+
+.post-content th,
+.post-content td {
+  padding: var(--spacing-md);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.post-content th {
+  font-weight: 600;
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
+}
+
+.post-content tr:hover {
+  background-color: var(--bg-tertiary);
+}
+
+/* Images */
+.post-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+  margin: var(--spacing-lg) 0;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+
+/* Post Footer */
+.post-footer {
+  margin-top: var(--spacing-2xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--border);
+}
+
+.post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.tag {
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.tag:hover {
+  background-color: var(--accent);
+  color: var(--bg-secondary);
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-2xl);
+  padding: var(--spacing-lg) 0;
+}
+
+.pagination a {
+  color: var(--text-primary);
+  text-decoration: none;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: all 0.2s;
+}
+
+.pagination a:hover {
+  background-color: var(--accent);
+  color: var(--bg-secondary);
+  border-color: var(--accent);
+}
+
+.page-info {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* Archive */
+.archive-year {
+  margin-bottom: var(--spacing-xl);
+}
+
+.archive-year h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
+  color: var(--accent);
+}
+
+.archive-month {
+  margin-bottom: var(--spacing-lg);
+  padding-left: var(--spacing-lg);
+}
+
+.archive-month h3 {
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-bottom: var(--spacing-sm);
+  color: var(--text-secondary);
+}
+
+.archive ul {
+  list-style: none;
+}
+
+.archive li {
+  margin-bottom: var(--spacing-xs);
+}
+
+.archive li time {
+  color: var(--text-tertiary);
+  font-family: "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  margin-right: var(--spacing-md);
+}
+
+.archive li a {
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.archive li a:hover {
+  color: var(--accent);
+}
+
+/* Footer */
+.site-footer {
+  padding: var(--spacing-xl) 0;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 var(--spacing-md);
+  }
+
+  .site-title {
+    font-size: 1.5rem;
+  }
+
+  .post-title {
+    font-size: 1.8rem;
+  }
+
+  .post-item-title {
+    font-size: 1.3rem;
+  }
+
+  .post-content {
+    font-size: 1rem;
+  }
+
+  .site-nav {
+    gap: var(--spacing-md);
+  }
+}
+
+/* Utility Classes */
+.text-center {
+  text-align: center;
+}
+
+.text-muted {
+  color: var(--text-tertiary);
+}
+
+.mt-lg {
+  margin-top: var(--spacing-lg);
+}
+
+.mb-lg {
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Print Styles */
+@media print {
+  .site-nav,
+  .site-footer,
+  .pagination {
+    display: none;
+  }
+
+  body {
+    background-color: white;
+    color: black;
+  }
+
+  .post-content a {
+    color: black;
+    text-decoration: underline;
+  }
+}
+</style>
+</head>
+<body class="post-page">
+  <div class="container">
+    <header class="site-header">
+      <h1 class="site-title"><a href="/">Shiori Blog</a></h1>
+      <p class="site-subtitle">A minimalist technical blog</p>
+      <nav class="site-nav">
+        <a href="/">Home</a>
+        <a href="/archives/">Archives</a>
+        <a href="/categories/">Categories</a>
+        <a href="/tags/">Tags</a>
+      </nav>
+    </header>
+
+    <main class="main-content">
+      <article class="post">
+        <header class="post-header">
+          <h1 class="post-title">自动控制原理：PID控制器详解</h1>
+          <div class="post-meta">
+            <time datetime="2025-12-26">2025-12-26</time>
+            <span class="post-author">by WSyhkkl00</span>
+            <span class="post-reading-time">6 min read</span>
+          </div>
+          
+          <div class="post-categories">
+            <a href="/categories/自动控制/" class="category-tag">自动控制</a><a href="/categories/控制理论/" class="category-tag">控制理论</a>
+          </div>
+          
+        </header>
+
+        <div class="post-content">
+          <h1>自动控制原理：PID控制器详解</h1>
+<p>PID控制器是工业控制中最常用的控制算法，从温度控制到机器人姿态控制，应用极其广泛。本文将深入解析PID控制原理。</p>
+<h2>反馈控制系统基础</h2>
+<p>反馈控制系统通过比较<strong>期望输出</strong>（设定值）和<strong>实际输出</strong>（测量值）的差异来调整控制量。</p>
+<pre><code>       ┌─────────┐      ┌─────────┐      ┌─────────┐
+设定值───→  比较器  ──e──→ 控制器 ──u──→  被控对象  ──→ 输出
+       └─────────┘      └─────────┘      └─────────┘
+                              ↑                │
+                              └─────反馈────────┘
+</code></pre>
+<h3>控制系统的目标</h3>
+<ol>
+<li><strong>稳定性</strong>：系统输出最终能收敛到稳定值</li>
+<li><strong>快速性</strong>：响应速度快，调节时间短</li>
+<li><strong>准确性</strong>：稳态误差小</li>
+</ol>
+<h2>PID控制原理</h2>
+<p>PID控制器由三个部分组成：</p>
+<ul>
+<li><strong>P（比例）</strong>：当前误差的控制</li>
+<li><strong>I（积分）</strong>：历史累积误差的控制</li>
+<li><strong>D（微分）</strong>：未来变化趋势的控制</li>
+</ul>
+<h3>数学表达式</h3>
+<p>$$u(t) = K_p e(t) + K_i \int_0^t e(\tau)d\tau + K_d \frac{de(t)}{dt}$$</p>
+<p>其中：</p>
+<ul>
+<li>$u(t)$：控制器的输出</li>
+<li>$e(t) = r(t) - y(t)$：误差（设定值 - 测量值）</li>
+<li>$K_p$：比例系数</li>
+<li>$K_i = K_p/T_i$：积分系数</li>
+<li>$K_d = K_p \cdot T_d$：微分系数</li>
+</ul>
+<h2>比例控制（P控制）</h2>
+<h3>原理</h3>
+<p>比例控制器的输出与误差成正比：</p>
+<p>$$u(t) = K_p e(t)$$</p>
+<h3>特点</h3>
+<ul>
+<li>响应速度快</li>
+<li>存在稳态误差</li>
+<li>Kp过大会导致系统不稳定</li>
+</ul>
+<h3>代码实现</h3>
+<pre><code class="language-python">class PController:
+    def __init__(self, kp):
+        self.kp = kp
+
+    def compute(self, setpoint, measured_value):
+        error = setpoint - measured_value
+        return self.kp * error
+
+# 使用示例
+controller = PController(kp=2.0)
+control_output = controller.compute(setpoint=100, measured_value=80)
+print(f&quot;控制输出: {control_output}&quot;)  # 输出: 40
+</code></pre>
+<h3>P控制的局限</h3>
+<p>假设水箱控制系统：</p>
+<ul>
+<li>目标水位：100cm</li>
+<li>当前水位：90cm</li>
+<li>Kp = 5</li>
+</ul>
+<p>控制输出 = 5 × (100 - 90) = 50</p>
+<p>但随着水位接近目标，误差减小，控制力减弱，最终无法完全消除误差。</p>
+<h2>积分控制（I控制）</h2>
+<h3>原理</h3>
+<p>积分控制器的输出与误差的积分成正比：</p>
+<p>$$u(t) = K_i \int_0^t e(\tau)d\tau$$</p>
+<h3>特点</h3>
+<ul>
+<li><strong>消除稳态误差</strong></li>
+<li>响应速度慢</li>
+<li>可能引起超调和振荡</li>
+</ul>
+<h3>代码实现</h3>
+<pre><code class="language-python">class IController:
+    def __init__(self, ki, dt):
+        self.ki = ki
+        self.dt = dt
+        self.integral = 0
+
+    def compute(self, setpoint, measured_value):
+        error = setpoint - measured_value
+        self.integral += error * self.dt
+        return self.ki * self.integral
+
+# 使用示例
+controller = IController(ki=0.5, dt=0.1)
+
+for i in range(10):
+    output = controller.compute(setpoint=100, measured_value=90)
+    print(f&quot;步骤{i+1}: 控制输出 = {output:.2f}&quot;)
+</code></pre>
+<h3>积分饱和问题</h3>
+<p>长时间存在大误差时，积分项会不断累积，导致<strong>积分饱和</strong>：</p>
+<pre><code class="language-python">class IControllerWithAntiWindup:
+    def __init__(self, ki, dt, output_limits):
+        self.ki = ki
+        self.dt = dt
+        self.output_limits = output_limits
+        self.integral = 0
+
+    def compute(self, setpoint, measured_value):
+        error = setpoint - measured_value
+        self.integral += error * self.dt
+
+        # 抗积分饱和：限制积分项
+        output = self.ki * self.integral
+        if output &gt; self.output_limits[1]:
+            self.integral = self.output_limits[1] / self.ki
+        elif output &lt; self.output_limits[0]:
+            self.integral = self.output_limits[0] / self.ki
+
+        return max(self.output_limits[0],
+                  min(output, self.output_limits[1]))
+</code></pre>
+<h2>微分控制（D控制）</h2>
+<h3>原理</h3>
+<p>微分控制器的输出与误差的变化率成正比：</p>
+<p>$$u(t) = K_d \frac{de(t)}{dt}$$</p>
+<h3>特点</h3>
+<ul>
+<li><strong>预测误差趋势</strong>，提前抑制</li>
+<li>改善动态性能</li>
+<li>对噪声敏感</li>
+</ul>
+<h3>代码实现</h3>
+<pre><code class="language-python">class DController:
+    def __init__(self, kd, dt):
+        self.kd = kd
+        self.dt = dt
+        self.prev_error = 0
+
+    def compute(self, setpoint, measured_value):
+        error = setpoint - measured_value
+        derivative = (error - self.prev_error) / self.dt
+        self.prev_error = error
+        return self.kd * derivative
+
+# 使用示例
+controller = DController(kd=1.0, dt=0.1)
+
+errors = [10, 8, 6, 4, 2]  # 误差逐渐减小
+for i, err in enumerate(errors):
+    # 模拟误差逐渐减小的情况
+    output = controller.compute(setpoint=100, measured_value=100-err)
+    print(f&quot;步骤{i+1}: 控制输出 = {output:.2f}&quot;)
+</code></pre>
+<h3>微分项的噪声抑制</h3>
+<p>实际应用中需要滤波：</p>
+<pre><code class="language-python">class DControllerWithFilter:
+    def __init__(self, kd, dt, alpha=0.1):
+        self.kd = kd
+        self.dt = dt
+        self.alpha = alpha  # 滤波系数
+        self.prev_error = 0
+        self.filtered_derivative = 0
+
+    def compute(self, setpoint, measured_value):
+        error = setpoint - measured_value
+        derivative = (error - self.prev_error) / self.dt
+
+        # 一阶低通滤波
+        self.filtered_derivative = (self.alpha * derivative +
+                                   (1 - self.alpha) * self.filtered_derivative)
+
+        self.prev_error = error
+        return self.kd * self.filtered_derivative
+</code></pre>
+<h2>完整PID控制器</h2>
+<h3>标准形式</h3>
+<pre><code class="language-python">class PIDController:
+    def __init__(self, kp, ki, kd, dt,
+                 output_limits=(None, None)):
+        self.kp = kp
+        self.ki = ki
+        self.kd = kd
+        self.dt = dt
+        self.output_limits = output_limits
+
+        self.integral = 0
+        self.prev_error = 0
+
+    def compute(self, setpoint, measured_value):
+        # 计算误差
+        error = setpoint - measured_value
+
+        # 比例项
+        p_term = self.kp * error
+
+        # 积分项（带抗饱和）
+        self.integral += error * self.dt
+        i_term = self.ki * self.integral
+
+        # 微分项
+        derivative = (error - self.prev_error) / self.dt
+        d_term = self.kd * derivative
+
+        # PID输出
+        output = p_term + i_term + d_term
+
+        # 输出限幅
+        if self.output_limits[0] is not None:
+            output = max(self.output_limits[0], output)
+        if self.output_limits[1] is not None:
+            output = min(self.output_limits[1], output)
+
+        self.prev_error = error
+        return output
+
+    def reset(self):
+        &quot;&quot;&quot;重置控制器状态&quot;&quot;&quot;
+        self.integral = 0
+        self.prev_error = 0
+</code></pre>
+<h3>应用示例：温度控制</h3>
+<pre><code class="language-python">import matplotlib.pyplot as plt
+import numpy as np
+
+class TemperatureSystem:
+    &quot;&quot;&quot;模拟加热系统&quot;&quot;&quot;
+    def __init__(self, ambient_temp=25):
+        self.temp = ambient_temp
+        self.ambient_temp = ambient_temp
+
+    def update(self, power, dt=0.1):
+        &quot;&quot;&quot;
+        power: 加热功率 [0-100%]
+        dt: 时间步长
+        &quot;&quot;&quot;
+        # 简单的热力学模型
+        heating = power * 0.5  # 加热效应
+        cooling = (self.temp - self.ambient_temp) * 0.05  # 冷却效应
+        self.temp += (heating - cooling) * dt
+        return self.temp
+
+# 仿真
+pid = PIDController(kp=2.0, ki=0.5, kd=0.8, dt=0.1,
+                   output_limits=(0, 100))
+system = TemperatureSystem()
+
+setpoint = 80
+temperatures = []
+outputs = []
+
+for t in range(200):
+    # 获取当前温度
+    current_temp = system.temp
+
+    # PID计算控制输出
+    control = pid.compute(setpoint, current_temp)
+    outputs.append(control)
+
+    # 更新系统
+    system.update(control)
+    temperatures.append(system.temp)
+
+# 绘图
+plt.figure(figsize=(12, 6))
+plt.plot(temperatures, label=&#39;实际温度&#39;)
+plt.axhline(y=setpoint, color=&#39;r&#39;, linestyle=&#39;--&#39;, label=&#39;目标温度&#39;)
+plt.xlabel(&#39;时间步&#39;)
+plt.ylabel(&#39;温度 (°C)&#39;)
+plt.title(&#39;PID温度控制响应&#39;)
+plt.legend()
+plt.grid(True)
+plt.show()
+</code></pre>
+<h2>PID参数整定</h2>
+<h3>Ziegler-Nichols法</h3>
+<ol>
+<li>设置Ki=0, Kd=0，逐渐增大Kp直到系统持续振荡</li>
+<li>记录临界增益Ku和振荡周期Tu</li>
+<li>按下表设置参数：</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>控制器</th>
+<th>Kp</th>
+<th>Ti</th>
+<th>Td</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>P</td>
+<td>0.5×Ku</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>PI</td>
+<td>0.45×Ku</td>
+<td>0.83×Tu</td>
+<td>-</td>
+</tr>
+<tr>
+<td>PID</td>
+<td>0.6×Ku</td>
+<td>0.5×Tu</td>
+<td>0.125×Tu</td>
+</tr>
+</tbody></table>
+<h3>试凑法</h3>
+<ol>
+<li>调整Kp，使系统响应加快但有超调</li>
+<li>调整Ki，消除稳态误差</li>
+<li>调整Kd，减小超调，改善稳定性</li>
+<li>重复以上步骤直到满意</li>
+</ol>
+<h2>PID的变种</h2>
+<h3>增量式PID</h3>
+<p>适用于执行机构需要增量信号的场景：</p>
+<pre><code class="language-python">class IncrementalPID:
+    def __init__(self, kp, ki, kd, dt):
+        self.kp = kp
+        self.ki = ki
+        self.kd = kd
+        self.dt = dt
+        self.prev_error = 0
+        self.prev_prev_error = 0
+
+    def compute(self, setpoint, measured_value):
+        error = setpoint - measured_value
+
+        # 计算增量
+        delta_u = (self.kp * (error - self.prev_error) +
+                   self.ki * error +
+                   self.kd * (error - 2*self.prev_error +
+                            self.prev_prev_error))
+
+        self.prev_prev_error = self.prev_error
+        self.prev_error = error
+
+        return delta_u
+</code></pre>
+<h3>分离积分PID</h3>
+<p>大误差时暂停积分，避免超调：</p>
+<pre><code class="language-python">class SeparatedIntegralPID(PIDController):
+    def __init__(self, kp, ki, kd, dt, separation_threshold=10):
+        super().__init__(kp, ki, kd, dt)
+        self.separation_threshold = separation_threshold
+
+    def compute(self, setpoint, measured_value):
+        error = setpoint - measured_value
+
+        # 大误差时暂停积分
+        if abs(error) &gt; self.separation_threshold:
+            # 只计算PD
+            self.integral = 0
+
+        return super().compute(setpoint, measured_value)
+</code></pre>
+<h2>实际应用注意事项</h2>
+<h3>1. 采样时间选择</h3>
+<ul>
+<li>采样周期应为系统时间常数的1/10 ~ 1/5</li>
+<li>过快会引入噪声，过慢会降低控制性能</li>
+</ul>
+<h3>2. 执行机构限幅</h3>
+<pre><code class="language-python">class Actuator:
+    def __init__(self, min_val, max_val):
+        self.min_val = min_val
+        self.max_val = max_val
+
+    def apply(self, control_signal):
+        clamped = max(self.min_val,
+                     min(control_signal, self.max_val))
+        # 执行控制动作
+        self.execute(clamped)
+</code></pre>
+<h3>3. 传感器滤波</h3>
+<pre><code class="language-python">def low_pass_filter(value, prev_filtered, alpha=0.1):
+    &quot;&quot;&quot;一阶低通滤波&quot;&quot;&quot;
+    return alpha * value + (1 - alpha) * prev_filtered
+</code></pre>
+<h3>4. 抗积分饱和</h3>
+<pre><code class="language-python">class AntiWindupPID(PIDController):
+    def compute(self, setpoint, measured_value, actual_output):
+        error = setpoint - measured_value
+
+        p_term = self.kp * error
+        self.integral += error * self.dt
+        i_term = self.ki * self.integral
+
+        derivative = (error - self.prev_error) / self.dt
+        d_term = self.kd * derivative
+
+        output = p_term + i_term + d_term
+
+        # 计算输出受限
+        limited = max(self.output_limits[0],
+                     min(output, self.output_limits[1]))
+
+        # 回算积分项（抗饱和）
+        if abs(output - limited) &gt; 1e-6:
+            self.integral = (limited - p_term - d_term) / self.ki
+
+        self.prev_error = error
+        return limited
+</code></pre>
+<h2>总结</h2>
+<p>PID控制器的三个作用：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>作用</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>P</strong></td>
+<td>响应当前误差</td>
+<td>响应快</td>
+<td>有稳态误差</td>
+</tr>
+<tr>
+<td><strong>I</strong></td>
+<td>消除历史误差</td>
+<td>无稳态误差</td>
+<td>响应慢，易超调</td>
+</tr>
+<tr>
+<td><strong>D</strong></td>
+<td>预测误差趋势</td>
+<td>减小超调</td>
+<td>对噪声敏感</td>
+</tr>
+</tbody></table>
+<p>PID调参口诀：</p>
+<blockquote>
+<p>参数整定找最佳，从小到大顺序查<br>先是比例后积分，最后再把微分加<br>曲线振荡很频繁，比例度盘要放大<br>曲线漂浮绕大弯，比例度盘往小扳<br>曲线偏离回复慢，积分时间往下降<br>曲线波动周期长，积分时间再加长<br>曲线振荡频率快，先把微分降下来<br>动差大来波动慢，微分时间应加长</p>
+</blockquote>
+<p>掌握PID控制，你就掌握了自动控制的精髓！</p>
+
+        </div>
+
+        
+        <footer class="post-footer">
+          <div class="post-tags">
+            <a href="/tags/PID控制/" class="tag">#PID控制</a><a href="/tags/自动化/" class="tag">#自动化</a><a href="/tags/反馈控制/" class="tag">#反馈控制</a><a href="/tags/系统设计/" class="tag">#系统设计</a>
+          </div>
+        </footer>
+        
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; WSyhkkl00 - Powered by Shiori</p>
+    </footer>
+  </div>
+</body>
+</html>

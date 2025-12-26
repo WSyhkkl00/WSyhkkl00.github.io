@@ -561,20 +561,10 @@ body {
           <h1 class="post-title">CAN通信基础教程</h1>
           <div class="post-meta">
             <time datetime="2024-11-17">2024-11-17</time>
-            {% if page.author %}
             <span class="post-author">by WSyhkkl00</span>
-            {% endif %}
-            {% if page.readingTime %}
             <span class="post-reading-time">2 min read</span>
-            {% endif %}
           </div>
-          {% if page.categories %}
-          <div class="post-categories">
-            {% for category in page.categories %}
-            <a href="/categories//" class="category-tag"></a>
-            {% endfor %}
-          </div>
-          {% endif %}
+          
         </header>
 
         <div class="post-content">
@@ -730,15 +720,13 @@ body {
 
         </div>
 
-        {% if page.tags %}
+        
         <footer class="post-footer">
           <div class="post-tags">
-            {% for tag in page.tags %}
-            <a href="/tags//" class="tag">#</a>
-            {% endfor %}
+            <a href="/tags/通信/" class="tag">#通信</a><a href="/tags/工业网络/" class="tag">#工业网络</a>
           </div>
         </footer>
-        {% endif %}
+        
       </article>
     </main>
 
