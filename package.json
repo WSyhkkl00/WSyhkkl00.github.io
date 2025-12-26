@@ -1,0 +1,27 @@
+{
+  "name": "shiori",
+  "version": "1.0.0",
+  "description": "A minimalist static blog generator for GitHub Pages",
+  "main": "index.js",
+  "scripts": {
+    "build": "node cli.js build",
+    "preview": "node cli.js preview",
+    "serve": "node cli.js serve",
+    "clean": "node cli.js clean"
+  },
+  "keywords": ["blog", "static-site-generator", "markdown", "github-pages"],
+  "author": "WSyhkkl00",
+  "license": "MIT",
+  "dependencies": {
+    "marked": "^15.0.4",
+    "highlight.js": "^11.10.0",
+    "front-matter": "^4.0.2",
+    "fs-extra": "^11.2.0",
+    "chokidar": "^4.0.3",
+    "express": "^4.21.2",
+    "gray-matter": "^4.0.3"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}

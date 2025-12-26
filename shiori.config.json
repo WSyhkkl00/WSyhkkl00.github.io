@@ -1,0 +1,56 @@
+{
+  "site": {
+    "title": "Shiori Blog",
+    "subtitle": "A minimalist technical blog",
+    "description": "Personal blog powered by Shiori",
+    "author": "WSyhkkl00",
+    "language": "en",
+    "timezone": "UTC"
+  },
+  "url": "https://WSyhkkl00.github.io",
+  "permalink": ":year/:month/:day/:title/",
+  "paths": {
+    "source": "source",
+    "output": "dist",
+    "posts": "_posts",
+    "categories": "categories",
+    "tags": "tags",
+    "assets": "assets"
+  },
+  "theme": {
+    "name": "minimalist",
+    "colors": {
+      "background": "#FAFAF9",
+      "surface": "#FFFFFF",
+      "text_primary": "#1C1917",
+      "text_secondary": "#57534E",
+      "accent": "#292524",
+      "border": "#E7E5E4",
+      "code_bg": "#1C1917",
+      "code_text": "#E7E5E4"
+    }
+  },
+  "pagination": {
+    "posts_per_page": 10,
+    "path": "page"
+  },
+  "posts": {
+    "default_layout": "post",
+    "excerpt_length": 200,
+    "show_excerpt": true,
+    "date_format": "YYYY-MM-DD",
+    "show_reading_time": true
+  },
+  "syntax": {
+    "theme": "github-dark",
+    "line_numbers": true
+  },
+  "preview": {
+    "port": 4000,
+    "live_reload": true
+  },
+  "build": {
+    "minify": false,
+    "source_maps": true
+  }
+}

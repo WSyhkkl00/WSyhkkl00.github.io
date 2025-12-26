@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tag: nodejs - Shiori Blog</title>
+  <style>/*
+ * Shiori Minimalist Theme
+ * A clean, technical blog style with gray, white, beige, and black colors
+ */
+
+/* CSS Variables - Color Palette */
+:root {
+  --bg-primary: #FAFAF9;      /* 米白色 - 主背景 */
+  --bg-secondary: #FFFFFF;     /* 纯白色 - 卡片/内容背景 */
+  --bg-tertiary: #F5F5F4;      /* 浅灰 - 次要背景 */
+
+  --text-primary: #1C1917;     /* 深黑色 - 主要文字 */
+  --text-secondary: #57534E;   /* 灰色 - 次要文字 */
+  --text-tertiary: #A8A29E;    /* 浅灰 - 辅助文字 */
+
+  --accent: #292524;           /* 强调色 - 深灰黑 */
+  --accent-light: #78716C;     /* 浅强调色 */
+
+  --border: #E7E5E4;           /* 边框灰 */
+  --border-light: #F5F5F4;     /* 浅边框 */
+
+  --code-bg: #1C1917;          /* 代码背景深色 */
+  --code-text: #E7E5E4;        /* 代码文字浅色 */
+
+  --shadow: rgba(0, 0, 0, 0.05);
+  --shadow-hover: rgba(0, 0, 0, 0.1);
+
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
+
+/* Reset & Base Styles */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.7;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Container */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
+  width: 100%;
+}
+
+/* Site Header */
+.site-header {
+  padding: var(--spacing-2xl) 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.site-title {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--spacing-xs);
+}
+
+.site-title a {
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.site-title a:hover {
+  opacity: 0.7;
+}
+
+.site-subtitle {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  font-weight: 400;
+  margin-bottom: var(--spacing-md);
+}
+
+/* Navigation */
+.site-nav {
+  display: flex;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+.site-nav a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.2s;
+  position: relative;
+}
+
+.site-nav a:hover {
+  color: var(--text-primary);
+}
+
+.site-nav a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--accent);
+  transition: width 0.2s;
+}
+
+.site-nav a:hover::after {
+  width: 100%;
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  padding-bottom: var(--spacing-2xl);
+}
+
+/* Posts List */
+.posts-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.post-item {
+  padding: var(--spacing-xl) 0;
+  border-bottom: 1px solid var(--border);
+  transition: border-color 0.2s;
+}
+
+.post-item:hover {
+  border-color: var(--accent);
+}
+
+.post-item-header {
+  margin-bottom: var(--spacing-md);
+}
+
+.post-item-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-xs);
+  letter-spacing: -0.01em;
+}
+
+.post-item-title a {
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.post-item-title a:hover {
+  color: var(--text-secondary);
+}
+
+.post-item-date {
+  color: var(--text-tertiary);
+  font-size: 0.9rem;
+  font-family: "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.post-item-excerpt {
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-md);
+  line-height: 1.6;
+}
+
+.read-more {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.read-more:hover {
+  color: var(--text-primary);
+}
+
+/* Single Post */
+.post {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.post-header {
+  margin-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--border);
+}
+
+.post-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-bottom: var(--spacing-md);
+}
+
+.post-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  color: var(--text-tertiary);
+  font-size: 0.9rem;
+  font-family: "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.post-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.category-tag {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.category-tag:hover {
+  background-color: var(--border);
+}
+
+.post-content {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.post-content h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-top: var(--spacing-2xl);
+  margin-bottom: var(--spacing-md);
+  letter-spacing: -0.01em;
+}
+
+.post-content h3 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-top: var(--spacing-xl);
+  margin-bottom: var(--spacing-sm);
+}
+
+.post-content p {
+  margin-bottom: var(--spacing-md);
+}
+
+.post-content a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.post-content a:hover {
+  border-bottom-color: var(--accent);
+}
+
+.post-content ul,
+.post-content ol {
+  margin-bottom: var(--spacing-md);
+  padding-left: var(--spacing-xl);
+}
+
+.post-content li {
+  margin-bottom: var(--spacing-xs);
+}
+
+.post-content blockquote {
+  border-left: 4px solid var(--accent);
+  padding-left: var(--spacing-lg);
+  margin: var(--spacing-lg) 0;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Code Blocks */
+.post-content pre {
+  background-color: var(--code-bg);
+  color: var(--code-text);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  margin-bottom: var(--spacing-lg);
+}
+
+.post-content code {
+  font-family: "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.9em;
+}
+
+.post-content :not(pre) > code {
+  background-color: var(--bg-tertiary);
+  color: var(--accent);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+}
+
+/* Tables */
+.post-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--spacing-lg);
+}
+
+.post-content th,
+.post-content td {
+  padding: var(--spacing-md);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.post-content th {
+  font-weight: 600;
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
+}
+
+.post-content tr:hover {
+  background-color: var(--bg-tertiary);
+}
+
+/* Images */
+.post-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+  margin: var(--spacing-lg) 0;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+
+/* Post Footer */
+.post-footer {
+  margin-top: var(--spacing-2xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--border);
+}
+
+.post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.tag {
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.tag:hover {
+  background-color: var(--accent);
+  color: var(--bg-secondary);
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-2xl);
+  padding: var(--spacing-lg) 0;
+}
+
+.pagination a {
+  color: var(--text-primary);
+  text-decoration: none;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: all 0.2s;
+}
+
+.pagination a:hover {
+  background-color: var(--accent);
+  color: var(--bg-secondary);
+  border-color: var(--accent);
+}
+
+.page-info {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* Archive */
+.archive-year {
+  margin-bottom: var(--spacing-xl);
+}
+
+.archive-year h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
+  color: var(--accent);
+}
+
+.archive-month {
+  margin-bottom: var(--spacing-lg);
+  padding-left: var(--spacing-lg);
+}
+
+.archive-month h3 {
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-bottom: var(--spacing-sm);
+  color: var(--text-secondary);
+}
+
+.archive ul {
+  list-style: none;
+}
+
+.archive li {
+  margin-bottom: var(--spacing-xs);
+}
+
+.archive li time {
+  color: var(--text-tertiary);
+  font-family: "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  margin-right: var(--spacing-md);
+}
+
+.archive li a {
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.archive li a:hover {
+  color: var(--accent);
+}
+
+/* Footer */
+.site-footer {
+  padding: var(--spacing-xl) 0;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 var(--spacing-md);
+  }
+
+  .site-title {
+    font-size: 1.5rem;
+  }
+
+  .post-title {
+    font-size: 1.8rem;
+  }
+
+  .post-item-title {
+    font-size: 1.3rem;
+  }
+
+  .post-content {
+    font-size: 1rem;
+  }
+
+  .site-nav {
+    gap: var(--spacing-md);
+  }
+}
+
+/* Utility Classes */
+.text-center {
+  text-align: center;
+}
+
+.text-muted {
+  color: var(--text-tertiary);
+}
+
+.mt-lg {
+  margin-top: var(--spacing-lg);
+}
+
+.mb-lg {
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Print Styles */
+@media print {
+  .site-nav,
+  .site-footer,
+  .pagination {
+    display: none;
+  }
+
+  body {
+    background-color: white;
+    color: black;
+  }
+
+  .post-content a {
+    color: black;
+    text-decoration: underline;
+  }
+}
+</style>
+</head>
+<body class="tag-page">
+  <div class="container">
+    <header class="site-header">
+      <h1 class="site-title"><a href="/">Shiori Blog</a></h1>
+      <nav class="site-nav">
+        <a href="/">Home</a>
+        <a href="/archives/">Archives</a>
+        <a href="/categories/">Categories</a>
+        <a href="/tags/">Tags</a>
+      </nav>
+    </header>
+
+    <main class="main-content">
+      <h1>Tag: nodejs</h1>
+      <div class="posts-list">
+        
+        <article class="post-item">
+          <h2><a href="//"></a></h2>
+          <time></time>
+        </article>
+        
+      </div>
+    </main>
+  </div>
+</body>
+</html>
