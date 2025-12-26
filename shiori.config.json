@@ -4,8 +4,8 @@
     "subtitle": "A minimalist technical blog",
     "description": "Personal blog powered by Shiori",
     "author": "WSyhkkl00",
-    "language": "en",
-    "timezone": "UTC"
+    "language": "zh-CN",
+    "timezone": "Asia/Shanghai"
   },
   "url": "https://WSyhkkl00.github.io",
   "permalink": ":year/:month/:day/:title/",
