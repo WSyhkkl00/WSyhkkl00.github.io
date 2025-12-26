@@ -73,6 +73,11 @@ body {
   width: 100%;
 }
 
+/* Post page container - wider for better reading */
+body.post-page .container {
+  max-width: 1200px;
+}
+
 /* Three-column layout */
 .home-layout {
   max-width: 1200px;
@@ -85,74 +90,46 @@ body {
   align-items: start;
 }
 
-/* Sidebar container */
+/* Sidebar container - unified card */
 .sidebar {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
 }
 
-/* Sidebar card base styles */
+/* Unified sidebar card */
 .sidebar-card {
   background-color: var(--bg-secondary);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
+  padding: var(--spacing-xl);
   box-shadow: 0 2px 8px var(--shadow);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
 }
 
-.sidebar-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-light) 100%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.sidebar-card:hover {
-  box-shadow: 0 4px 16px var(--shadow-hover);
-  transform: translateY(-2px);
-}
-
-.sidebar-card:hover::before {
-  opacity: 1;
-}
-
-/* Author card */
+/* Author section */
 .author-card {
   text-align: center;
-  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
 }
 
-.author-card::before {
-  background: linear-gradient(90deg, var(--accent) 0%, var(--text-secondary) 50%, var(--accent) 100%);
+.author-card:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 .author-avatar {
-  width: 88px;
-  height: 88px;
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: var(--spacing-md);
-  border: 3px solid var(--border);
-  box-shadow: 0 4px 12px var(--shadow);
-  transition: all 0.3s ease;
-}
-
-.author-card:hover .author-avatar {
-  transform: scale(1.05);
-  box-shadow: 0 6px 16px var(--shadow-hover);
+  border: 2px solid var(--border);
 }
 
 .author-name {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: var(--spacing-sm);
@@ -164,25 +141,18 @@ body {
   line-height: 1.6;
 }
 
-/* Featured posts card */
+/* Featured posts section */
+.featured-card {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
 .sidebar-title {
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--accent);
-  margin-bottom: var(--spacing-md);
-  padding-bottom: var(--spacing-sm);
-  border-bottom: 2px solid var(--border);
-  position: relative;
-}
-
-.featured-card .sidebar-title::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 40px;
-  height: 2px;
-  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-light) 100%);
+  margin-bottom: var(--spacing-lg);
 }
 
 .featured-list {
@@ -191,22 +161,6 @@ body {
 
 .featured-item {
   margin-bottom: var(--spacing-md);
-  position: relative;
-  padding-left: var(--spacing-md);
-}
-
-.featured-item::before {
-  content: '▹';
-  position: absolute;
-  left: 0;
-  color: var(--accent);
-  font-size: 1.2rem;
-  transition: all 0.2s ease;
-}
-
-.featured-item:hover::before {
-  transform: translateX(2px);
-  color: var(--text-secondary);
 }
 
 .featured-item:last-child {
@@ -216,14 +170,11 @@ body {
 .featured-link {
   display: block;
   text-decoration: none;
-  padding: var(--spacing-sm);
-  border-radius: var(--radius-sm);
-  transition: all 0.2s;
+  transition: opacity 0.2s;
 }
 
 .featured-link:hover {
-  background-color: var(--bg-tertiary);
-  transform: translateX(2px);
+  opacity: 0.7;
 }
 
 .featured-title {
@@ -362,6 +313,13 @@ body {
   line-height: 1.6;
 }
 
+.post-item-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
 .read-more {
   color: var(--accent);
   text-decoration: none;
@@ -375,8 +333,17 @@ body {
 
 /* Single Post */
 .post {
-  max-width: 720px;
+  max-width: 100%;
   margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 220px;
+  gap: var(--spacing-2xl);
+  align-items: start;
+}
+
+.post-main {
+  grid-column: 1;
+  min-width: 0; /* Allow content to shrink properly */
 }
 
 .post-header {
@@ -429,21 +396,48 @@ body {
 }
 
 .post-content h2 {
-  font-size: 1.8rem;
-  font-weight: 600;
-  margin-top: var(--spacing-2xl);
-  margin-bottom: var(--spacing-md);
-  letter-spacing: -0.01em;
-  padding-bottom: var(--spacing-sm);
-  border-bottom: 1px solid var(--border);
+  font-size: 1.5rem;
+  font-weight: 650;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  letter-spacing: -0.015em;
+  line-height: 1.4;
+  padding-bottom: 0.6rem;
+  border-bottom: 2px solid var(--border);
+  position: relative;
+}
+
+.post-content h2::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 60px;
+  height: 2px;
+  background-color: var(--accent);
 }
 
 .post-content h3 {
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   font-weight: 600;
-  margin-top: var(--spacing-xl);
-  margin-bottom: var(--spacing-sm);
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
   color: var(--accent);
+  position: relative;
+  padding-left: 1rem;
+}
+
+.post-content h3::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.2rem;
+  bottom: 0.2rem;
+  width: 3px;
+  background-color: var(--border);
+  border-radius: 2px;
 }
 
 .post-content h4 {
@@ -452,6 +446,85 @@ body {
   margin-top: var(--spacing-lg);
   margin-bottom: var(--spacing-sm);
   color: var(--text-secondary);
+}
+
+/* Table of Contents - Sidebar */
+.post-sidebar {
+  grid-column: 2;
+  position: sticky;
+  top: var(--spacing-2xl);
+  max-height: calc(100vh - var(--spacing-2xl) * 2);
+  overflow-y: auto;
+}
+
+.post-toc {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  box-shadow: 0 2px 8px var(--shadow);
+}
+
+.post-toc-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: var(--spacing-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-bottom: var(--spacing-xs);
+  border-bottom: 1px solid var(--border);
+}
+
+.post-toc-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.post-toc-list .toc-item {
+  margin-bottom: 2px;
+}
+
+.post-toc-list .toc-item:last-child {
+  margin-bottom: 0;
+}
+
+.post-toc-list .toc-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  display: block;
+  padding: 4px var(--spacing-sm);
+  border-left: 2px solid var(--border);
+  transition: all 0.2s;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.post-toc-list .toc-link:hover {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  background-color: var(--bg-tertiary);
+}
+
+.post-toc-list .toc-link.active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  font-weight: 500;
+}
+
+.post-toc-list .toc-sublist {
+  list-style: none;
+  padding-left: var(--spacing-sm);
+  margin-top: 2px;
+}
+
+.post-toc-list .toc-sublist .toc-link {
+  font-size: 0.75rem;
+  border-left-width: 1px;
+  padding: 3px var(--spacing-sm);
 }
 
 .post-content p {
@@ -508,6 +581,7 @@ body {
   line-height: 1.6;
   box-shadow: 0 2px 8px var(--shadow);
   position: relative;
+  max-width: 100%;
 }
 
 .post-content code {
@@ -531,6 +605,9 @@ body {
   box-shadow: 0 2px 8px var(--shadow);
   border-radius: var(--radius-md);
   overflow: hidden;
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .post-content th,
@@ -686,6 +763,13 @@ body {
 }
 
 /* Responsive Design */
+@media (max-width: 1280px) {
+  .post {
+    grid-template-columns: 1fr 200px;
+    gap: var(--spacing-xl);
+  }
+}
+
 @media (max-width: 1024px) {
   .home-grid {
     grid-template-columns: 1fr;
@@ -698,6 +782,18 @@ body {
 
   .sidebar-card {
     margin-bottom: var(--spacing-md);
+  }
+
+  .post {
+    grid-template-columns: 1fr;
+  }
+
+  .post-main {
+    grid-column: 1;
+  }
+
+  .post-sidebar {
+    display: none;
   }
 }
 
@@ -784,31 +880,25 @@ body {
       <article class="post-item">
         <header class="post-item-header">
           <h2 class="post-item-title">
-            <a href="/2025/12/26/pid-control-theory/">自动控制原理：PID控制器详解</a>
-          </h2>
-          <time class="post-item-date" datetime="2025-12-26">2025-12-26</time>
-        </header>
-        
-        <div class="post-item-excerpt">
-          自动控制原理：PID控制器详解  PID控制器是工业控制中最常用的控制算法，从温度控制到机器人姿态控制，应用极其广泛。本文将深入解析PID控制原理。  反馈控制系统基础  反馈控制系统通过比较期望输出（设定值）和实际输出（测量值）的差异来调整控制量。          ┌─────────┐      ┌─────────┐      ┌─────────┐ 设定值───→  比较器  ──e──...
-        </div>
-        
-        <a href="/2025/12/26/pid-control-theory/" class="read-more">Read more &rarr;</a>
-      </article>
-    
-      <article class="post-item">
-        <header class="post-item-header">
-          <h2 class="post-item-title">
             <a href="/2025/12/26/移动设备内存管理优化/">移动设备内存管理优化</a>
           </h2>
           <time class="post-item-date" datetime="2025-12-26">2025-12-26</time>
         </header>
         
-        <div class="post-item-excerpt">
-          背景：用户每天应用切换超过100次，重启延迟是关键体验指标，厂商以"保活几十个APP"为卖点。实际上数据显示用户日均使用APP不超过7个，核心体验重于保活数量  基础内存回收策略：杀进程（进程终止，冷启动，用户体验差），换页到闪存（慢速IO），写入损耗闪存寿命（SWAP方案）  ZRAM：在DRAM内部创建透明压缩的虚拟存储层，把数据压缩后仍在内存里待着。LRU只认最近使用，但是有些数据是...
+      </article>
+    
+      <article class="post-item">
+        <header class="post-item-header">
+          <h2 class="post-item-title">
+            <a href="/2025/12/26/pid-control-theory/">自动控制原理：PID控制器详解</a>
+          </h2>
+          <time class="post-item-date" datetime="2025-12-26">2025-12-26</time>
+        </header>
+        
+        <div class="post-item-tags">
+          <a href="/tags/PID控制/" class="tag">#PID控制</a><a href="/tags/自动化/" class="tag">#自动化</a><a href="/tags/反馈控制/" class="tag">#反馈控制</a><a href="/tags/系统设计/" class="tag">#系统设计</a>
         </div>
         
-        <a href="/2025/12/26/移动设备内存管理优化/" class="read-more">Read more &rarr;</a>
       </article>
     
       <article class="post-item">
@@ -819,11 +909,10 @@ body {
           <time class="post-item-date" datetime="2025-12-26">2025-12-26</time>
         </header>
         
-        <div class="post-item-excerpt">
-          计算机网络：深入理解TCP/IP协议栈  TCP/IP协议栈是现代互联网的基石，理解它对于网络编程和系统设计至关重要。本文将全面解析TCP/IP协议栈的各个层次。  TCP/IP模型概览  TCP/IP模型分为四层，从下到上依次为：   ┌─────────────────────────────────┐ │   应用层 (Application Layer)     │  HTTP, FTP,...
+        <div class="post-item-tags">
+          <a href="/tags/TCP/IP/" class="tag">#TCP/IP</a><a href="/tags/网络编程/" class="tag">#网络编程</a><a href="/tags/协议栈/" class="tag">#协议栈</a><a href="/tags/Socket/" class="tag">#Socket</a>
         </div>
         
-        <a href="/2025/12/26/computer-networking-tcp-ip/" class="read-more">Read more &rarr;</a>
       </article>
     
       <article class="post-item">
@@ -834,11 +923,10 @@ body {
           <time class="post-item-date" datetime="2025-12-26">2025-12-26</time>
         </header>
         
-        <div class="post-item-excerpt">
-          动机  动机状态的核心功能是驱动有机体采取行动，以获取生存所需资源或逃避危险。这一过程主要由大脑的奖赏系统和稳态系统协同完成，并受前额叶皮层的高级认知调节。  动机取决于内部变量和外部变量  - 内部变量：饥饿，口渴，生物钟，对规则的认知，认知过程等。总结起来是大脑对机体当前生理需求和长期经验形成的内部模型。 - 外部变量：奖励，激励，刺激（脱水的猎豹即使在寻找羚羊，看到水坑时会去先...
+        <div class="post-item-tags">
+          <a href="/tags/神经科学/" class="tag">#神经科学</a><a href="/tags/医学/" class="tag">#医学</a>
         </div>
         
-        <a href="/2025/12/26/神经科学/" class="read-more">Read more &rarr;</a>
       </article>
     
       <article class="post-item">
@@ -849,11 +937,10 @@ body {
           <time class="post-item-date" datetime="2025-12-26">2025-12-26</time>
         </header>
         
-        <div class="post-item-excerpt">
-          操作系统核心概念：进程与线程详解  进程和线程是操作系统中最重要的两个概念，理解它们的区别和联系对于成为一名优秀的程序员至关重要。本文将深入探讨这两个核心概念。  什么是进程？  进程是操作系统资源分配的基本单位，是程序在执行过程中的一个实例。每个进程都有自己独立的内存空间、文件描述符、堆栈等资源。  进程的特性  - 独立性：每个进程都有自己独立的地址空间，进程间通信需要特殊的机制（IPC） -...
+        <div class="post-item-tags">
+          <a href="/tags/操作系统/" class="tag">#操作系统</a><a href="/tags/进程管理/" class="tag">#进程管理</a><a href="/tags/多线程/" class="tag">#多线程</a><a href="/tags/并发编程/" class="tag">#并发编程</a>
         </div>
         
-        <a href="/2025/12/26/operating-system-processes/" class="read-more">Read more &rarr;</a>
       </article>
     
         </div>
@@ -862,33 +949,35 @@ body {
 
       
     <aside class="sidebar">
-      <!-- Author Card -->
-      <div class="sidebar-card author-card">
-        <img src="https://github.com/WSyhkkl00.png" alt="WSyhkkl00" class="author-avatar">
-        <h3 class="author-name">WSyhkkl00</h3>
-        <p class="author-bio">技术爱好者，专注于网络编程、控制系统和开源软件</p>
-      </div>
+      <div class="sidebar-card">
+        <!-- Author Section -->
+        <div class="author-card">
+          <img src="https://github.com/WSyhkkl00.png" alt="WSyhkkl00" class="author-avatar">
+          <h3 class="author-name">WSyhkkl00</h3>
+          <p class="author-bio">机器人技术，操作系统，互联网技术爱好者</p>
+        </div>
 
-      <!-- Featured Posts Card -->
-      <div class="sidebar-card featured-card">
-        <h3 class="sidebar-title">Featured Posts</h3>
-        <ul class="featured-list">
-          
-            <li class="featured-item">
-              <a href="/2025/12/26/pid-control-theory/" class="featured-link">
-                <span class="featured-title">自动控制原理：PID控制器详解</span>
-                <time class="featured-date">2025-12-26</time>
-              </a>
-            </li>
-          
-            <li class="featured-item">
-              <a href="/2025/12/26/computer-networking-tcp-ip/" class="featured-link">
-                <span class="featured-title">计算机网络：深入理解TCP/IP协议栈</span>
-                <time class="featured-date">2025-12-26</time>
-              </a>
-            </li>
-          
-        </ul>
+        <!-- Featured Posts Section -->
+        <div class="featured-card">
+          <h3 class="sidebar-title">Featured Posts</h3>
+          <ul class="featured-list">
+            
+              <li class="featured-item">
+                <a href="/2025/12/26/pid-control-theory/" class="featured-link">
+                  <span class="featured-title">自动控制原理：PID控制器详解</span>
+                  <time class="featured-date">2025-12-26</time>
+                </a>
+              </li>
+            
+              <li class="featured-item">
+                <a href="/2025/12/26/computer-networking-tcp-ip/" class="featured-link">
+                  <span class="featured-title">计算机网络：深入理解TCP/IP协议栈</span>
+                  <time class="featured-date">2025-12-26</time>
+                </a>
+              </li>
+            
+          </ul>
+        </div>
       </div>
     </aside>
     

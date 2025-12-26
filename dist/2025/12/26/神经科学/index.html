@@ -73,6 +73,11 @@ body {
   width: 100%;
 }
 
+/* Post page container - wider for better reading */
+body.post-page .container {
+  max-width: 1200px;
+}
+
 /* Three-column layout */
 .home-layout {
   max-width: 1200px;
@@ -85,74 +90,46 @@ body {
   align-items: start;
 }
 
-/* Sidebar container */
+/* Sidebar container - unified card */
 .sidebar {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
 }
 
-/* Sidebar card base styles */
+/* Unified sidebar card */
 .sidebar-card {
   background-color: var(--bg-secondary);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
+  padding: var(--spacing-xl);
   box-shadow: 0 2px 8px var(--shadow);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
 }
 
-.sidebar-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-light) 100%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.sidebar-card:hover {
-  box-shadow: 0 4px 16px var(--shadow-hover);
-  transform: translateY(-2px);
-}
-
-.sidebar-card:hover::before {
-  opacity: 1;
-}
-
-/* Author card */
+/* Author section */
 .author-card {
   text-align: center;
-  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
 }
 
-.author-card::before {
-  background: linear-gradient(90deg, var(--accent) 0%, var(--text-secondary) 50%, var(--accent) 100%);
+.author-card:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 .author-avatar {
-  width: 88px;
-  height: 88px;
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: var(--spacing-md);
-  border: 3px solid var(--border);
-  box-shadow: 0 4px 12px var(--shadow);
-  transition: all 0.3s ease;
-}
-
-.author-card:hover .author-avatar {
-  transform: scale(1.05);
-  box-shadow: 0 6px 16px var(--shadow-hover);
+  border: 2px solid var(--border);
 }
 
 .author-name {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: var(--spacing-sm);
@@ -164,25 +141,18 @@ body {
   line-height: 1.6;
 }
 
-/* Featured posts card */
+/* Featured posts section */
+.featured-card {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
 .sidebar-title {
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--accent);
-  margin-bottom: var(--spacing-md);
-  padding-bottom: var(--spacing-sm);
-  border-bottom: 2px solid var(--border);
-  position: relative;
-}
-
-.featured-card .sidebar-title::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 40px;
-  height: 2px;
-  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-light) 100%);
+  margin-bottom: var(--spacing-lg);
 }
 
 .featured-list {
@@ -191,22 +161,6 @@ body {
 
 .featured-item {
   margin-bottom: var(--spacing-md);
-  position: relative;
-  padding-left: var(--spacing-md);
-}
-
-.featured-item::before {
-  content: '▹';
-  position: absolute;
-  left: 0;
-  color: var(--accent);
-  font-size: 1.2rem;
-  transition: all 0.2s ease;
-}
-
-.featured-item:hover::before {
-  transform: translateX(2px);
-  color: var(--text-secondary);
 }
 
 .featured-item:last-child {
@@ -216,14 +170,11 @@ body {
 .featured-link {
   display: block;
   text-decoration: none;
-  padding: var(--spacing-sm);
-  border-radius: var(--radius-sm);
-  transition: all 0.2s;
+  transition: opacity 0.2s;
 }
 
 .featured-link:hover {
-  background-color: var(--bg-tertiary);
-  transform: translateX(2px);
+  opacity: 0.7;
 }
 
 .featured-title {
@@ -362,6 +313,13 @@ body {
   line-height: 1.6;
 }
 
+.post-item-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
 .read-more {
   color: var(--accent);
   text-decoration: none;
@@ -375,8 +333,17 @@ body {
 
 /* Single Post */
 .post {
-  max-width: 720px;
+  max-width: 100%;
   margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 220px;
+  gap: var(--spacing-2xl);
+  align-items: start;
+}
+
+.post-main {
+  grid-column: 1;
+  min-width: 0; /* Allow content to shrink properly */
 }
 
 .post-header {
@@ -429,21 +396,48 @@ body {
 }
 
 .post-content h2 {
-  font-size: 1.8rem;
-  font-weight: 600;
-  margin-top: var(--spacing-2xl);
-  margin-bottom: var(--spacing-md);
-  letter-spacing: -0.01em;
-  padding-bottom: var(--spacing-sm);
-  border-bottom: 1px solid var(--border);
+  font-size: 1.5rem;
+  font-weight: 650;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  letter-spacing: -0.015em;
+  line-height: 1.4;
+  padding-bottom: 0.6rem;
+  border-bottom: 2px solid var(--border);
+  position: relative;
+}
+
+.post-content h2::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 60px;
+  height: 2px;
+  background-color: var(--accent);
 }
 
 .post-content h3 {
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   font-weight: 600;
-  margin-top: var(--spacing-xl);
-  margin-bottom: var(--spacing-sm);
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
   color: var(--accent);
+  position: relative;
+  padding-left: 1rem;
+}
+
+.post-content h3::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.2rem;
+  bottom: 0.2rem;
+  width: 3px;
+  background-color: var(--border);
+  border-radius: 2px;
 }
 
 .post-content h4 {
@@ -452,6 +446,85 @@ body {
   margin-top: var(--spacing-lg);
   margin-bottom: var(--spacing-sm);
   color: var(--text-secondary);
+}
+
+/* Table of Contents - Sidebar */
+.post-sidebar {
+  grid-column: 2;
+  position: sticky;
+  top: var(--spacing-2xl);
+  max-height: calc(100vh - var(--spacing-2xl) * 2);
+  overflow-y: auto;
+}
+
+.post-toc {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  box-shadow: 0 2px 8px var(--shadow);
+}
+
+.post-toc-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: var(--spacing-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-bottom: var(--spacing-xs);
+  border-bottom: 1px solid var(--border);
+}
+
+.post-toc-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.post-toc-list .toc-item {
+  margin-bottom: 2px;
+}
+
+.post-toc-list .toc-item:last-child {
+  margin-bottom: 0;
+}
+
+.post-toc-list .toc-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  display: block;
+  padding: 4px var(--spacing-sm);
+  border-left: 2px solid var(--border);
+  transition: all 0.2s;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.post-toc-list .toc-link:hover {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  background-color: var(--bg-tertiary);
+}
+
+.post-toc-list .toc-link.active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  font-weight: 500;
+}
+
+.post-toc-list .toc-sublist {
+  list-style: none;
+  padding-left: var(--spacing-sm);
+  margin-top: 2px;
+}
+
+.post-toc-list .toc-sublist .toc-link {
+  font-size: 0.75rem;
+  border-left-width: 1px;
+  padding: 3px var(--spacing-sm);
 }
 
 .post-content p {
@@ -508,6 +581,7 @@ body {
   line-height: 1.6;
   box-shadow: 0 2px 8px var(--shadow);
   position: relative;
+  max-width: 100%;
 }
 
 .post-content code {
@@ -531,6 +605,9 @@ body {
   box-shadow: 0 2px 8px var(--shadow);
   border-radius: var(--radius-md);
   overflow: hidden;
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .post-content th,
@@ -686,6 +763,13 @@ body {
 }
 
 /* Responsive Design */
+@media (max-width: 1280px) {
+  .post {
+    grid-template-columns: 1fr 200px;
+    gap: var(--spacing-xl);
+  }
+}
+
 @media (max-width: 1024px) {
   .home-grid {
     grid-template-columns: 1fr;
@@ -698,6 +782,18 @@ body {
 
   .sidebar-card {
     margin-bottom: var(--spacing-md);
+  }
+
+  .post {
+    grid-template-columns: 1fr;
+  }
+
+  .post-main {
+    grid-column: 1;
+  }
+
+  .post-sidebar {
+    display: none;
   }
 }
 
@@ -793,24 +889,25 @@ body {
           
         </header>
 
-        <div class="post-content">
-          <h2>动机</h2>
+        <div class="post-main">
+          <div class="post-content">
+            <h2 id="动机">动机</h2>
 <p>动机状态的核心功能是驱动有机体采取行动，以获取生存所需资源或逃避危险。这一过程主要由大脑的<strong>奖赏系统</strong>和<strong>稳态系统</strong>协同完成，并受前额叶皮层的高级认知调节。</p>
 <p><strong>动机取决于内部变量和外部变量</strong></p>
 <ul>
 <li>内部变量：饥饿，口渴，生物钟，对规则的认知，认知过程等。总结起来是大脑对<strong>机体当前生理需求和长期经验形成的内部模型</strong>。</li>
 <li>外部变量：奖励，激励，刺激（脱水的猎豹即使在寻找羚羊，看到水坑时会去先喝水），总结起来是<strong>环境中具有潜在生存价值的感官信号</strong>。</li>
 </ul>
-<h2>短期调节与长期目标</h2>
+<h2 id="短期调节与长期目标">短期调节与长期目标</h2>
 <ul>
 <li><strong>&quot;短期调节性动机&quot;</strong>：&quot;服务于&quot;<strong>生理稳态</strong>（如能量、水分、体温平衡），行为旨在快速纠正由内部变量（如血糖下降、脱水）引发的生理失衡。</li>
 <li><strong>&quot;长期非调节性动机&quot;</strong>：&quot;服务于&quot;<strong>长期生理需求</strong>（如繁殖、育幼），或者 <strong>&quot;抽象社会目标&quot;</strong>（如学位、职业成就）。目标遥远，行动与最终奖赏之间隔着复杂的行为序列和漫长的时间。</li>
 </ul>
-<h2>奖励</h2>
+<h2 id="奖励">奖励</h2>
 <p>奖励是可取的对象、刺激或行动。</p>
 <p>奖励往往会引发驱动接近行为的动机状态。</p>
 <p>奖励可以在短期内满足监管需求，但也可以来自实现长期目标的复杂行为序列。</p>
-<h2>神经科学对大脑奖赏系统认知的研究过程</h2>
+<h2 id="神经科学对大脑奖赏系统认知的研究过程">神经科学对大脑奖赏系统认知的研究过程</h2>
 <p><strong>第一阶段：早期的简单理论——“多巴胺是快乐分子”</strong></p>
 <p>通过实验发现脑刺激奖励（老鼠疯狂自我刺激）和成瘾药物都能强烈激活多巴胺系统。</p>
 <p>带来观点，认为多巴胺直接产生主观的愉悦感。</p>
@@ -821,11 +918,11 @@ body {
 <p>实验揭示了多巴胺响应的峰值，<strong>从奖励本身转移到了预测奖励的线索上</strong>。</p>
 <p><strong>正误差告诉大脑：“刚才的行为/线索很有价值，记住它，多做！”负误差则促使大脑调整预测和行为。</strong></p>
 <p><strong>多巴胺传递的不是&quot;我现在很快乐&quot;，而是&quot;哇！这比我预期的要好！&quot;（正误差），或者&quot;唉，这比预期的差&quot;（负误差），又或者&quot;一切如我所料&quot;（无误差）。</strong></p>
-<h2>舒尔茨猴子实验</h2>
+<h2 id="舒尔茨猴子实验">舒尔茨猴子实验</h2>
 <p>多巴胺释放量 ∝ (实际奖励值 - 预期奖励值)</p>
 <p>多巴胺系统主要驱动<strong>动机（想要）</strong>，而<strong>享乐体验（喜欢）</strong> 由其他脑区（眶额叶皮层、岛叶等）负责</p>
 <p><strong>最大的驱动力，分配给那些被证明是“未来资源获取的可靠承诺”的刺激（即线索），而不是资源本身。</strong></p>
-<h3><strong>1.预测误差信号</strong></h3>
+<h3 id="1预测误差信号"><strong>1.预测误差信号</strong></h3>
 <ul>
 <li>舒尔茨猴子实验：多巴胺响应从“奖励出现时”转移到“预测线索出现时”</li>
 <li>奖励缺失时多巴胺活动被抑制</li>
@@ -833,44 +930,56 @@ body {
 </ul>
 <p>多巴胺不是“快乐”信号，而是 <strong>“对未来奖赏的预期”或“对预测本身的确信”</strong> 的信号。它驱动的是“想要”和“寻求”，而非“拥有”时的满足。</p>
 <p>这解释了为什么<strong>期待假期往往比假期本身更令人兴奋</strong>；为什么<strong>购物车里的东西比买到手后更吸引人</strong>。</p>
-<h3><strong>2.从神经机制到行为模式</strong></h3>
+<h3 id="2从神经机制到行为模式"><strong>2.从神经机制到行为模式</strong></h3>
 <ul>
 <li>成瘾作为预测误差系统的病理状态</li>
 <li>社交媒体设计的神经工程学</li>
 <li>拖延症的神经计算模型</li>
 </ul>
-<h3><strong>3.干预策略</strong></h3>
+<h3 id="3干预策略"><strong>3.干预策略</strong></h3>
 <ul>
 <li>减少不良行为的线索，增加良性行为的线索</li>
 <li>重写大脑的预测模型，观察并理解自身的预测误差反应，而非被其控制</li>
 <li>主动为健康行为“注入”多巴胺信号</li>
 </ul>
-<h2>现实指导意义</h2>
-<h3><strong>现代数字产品的设计逻辑</strong></h3>
+<h2 id="现实指导意义">现实指导意义</h2>
+<h3 id="现代数字产品的设计逻辑"><strong>现代数字产品的设计逻辑</strong></h3>
 <ul>
 <li>无限滚动的信息流：你永远不知道下一条是什么（最大化预测误差）</li>
 <li>红点通知：作为线索，直接触发检查欲望</li>
 <li>随机奖励机制：点赞、评论的到来不可预测</li>
 </ul>
-<h3><strong>不良习惯的维持机制</strong></h3>
+<h3 id="不良习惯的维持机制"><strong>不良习惯的维持机制</strong></h3>
 <ul>
 <li>刷手机到深夜：实际体验可能很疲惫（低喜欢），但仍停不下来（高想要）</li>
 <li>情绪性进食：食物带来的安慰感很短暂，但“吃”的冲动很强</li>
 </ul>
-<h3>干预</h3>
+<h3 id="干预">干预</h3>
 <ul>
 <li><strong>当渴望刷手机时</strong>，内心旁白：“我大脑的多巴胺系统现在被‘无聊’或‘压力’线索触发，预测滑动屏幕会有惊喜。这是我被训练出的反应。我可以选择验证这个预测，也可以选择用一个新行为（如快走5分钟）来给它新数据。”</li>
 <li><strong>当拖延时</strong>：“我的大脑在夸大启动任务的痛苦，并低估完成后的价值。我不需要等‘有感觉’，我只需要用25分钟启动一个微小循环，让事实来修正这个预测。”</li>
 </ul>
 
+          </div>
+
+          
+          <footer class="post-footer">
+            <div class="post-tags">
+              <a href="/tags/神经科学/" class="tag">#神经科学</a><a href="/tags/医学/" class="tag">#医学</a>
+            </div>
+          </footer>
+          
         </div>
 
         
-        <footer class="post-footer">
-          <div class="post-tags">
-            <a href="/tags/神经科学/" class="tag">#神经科学</a><a href="/tags/医学/" class="tag">#医学</a>
-          </div>
-        </footer>
+        <aside class="post-sidebar">
+          <nav class="post-toc">
+            <div class="post-toc-title">目录</div>
+            <ul class="post-toc-list">
+              <li class="toc-item"><a href="#动机" class="toc-link">动机</a></li><li class="toc-item"><a href="#短期调节与长期目标" class="toc-link">短期调节与长期目标</a></li><li class="toc-item"><a href="#奖励" class="toc-link">奖励</a></li><li class="toc-item"><a href="#神经科学对大脑奖赏系统认知的研究过程" class="toc-link">神经科学对大脑奖赏系统认知的研究过程</a></li><li class="toc-item"><a href="#舒尔茨猴子实验" class="toc-link">舒尔茨猴子实验</a><ul class="toc-sublist"><li class="toc-item"><a href="#1预测误差信号" class="toc-link">1.预测误差信号</a></li><li class="toc-item"><a href="#2从神经机制到行为模式" class="toc-link">2.从神经机制到行为模式</a></li><li class="toc-item"><a href="#3干预策略" class="toc-link">3.干预策略</a></li></ul></li><li class="toc-item"><a href="#现实指导意义" class="toc-link">现实指导意义</a><ul class="toc-sublist"><li class="toc-item"><a href="#现代数字产品的设计逻辑" class="toc-link">现代数字产品的设计逻辑</a></li><li class="toc-item"><a href="#不良习惯的维持机制" class="toc-link">不良习惯的维持机制</a></li><li class="toc-item"><a href="#干预" class="toc-link">干预</a></li></ul></li>
+            </ul>
+          </nav>
+        </aside>
         
       </article>
     </main>

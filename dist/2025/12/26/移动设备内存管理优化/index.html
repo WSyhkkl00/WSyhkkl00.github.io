@@ -73,6 +73,11 @@ body {
   width: 100%;
 }
 
+/* Post page container - wider for better reading */
+body.post-page .container {
+  max-width: 1200px;
+}
+
 /* Three-column layout */
 .home-layout {
   max-width: 1200px;
@@ -85,74 +90,46 @@ body {
   align-items: start;
 }
 
-/* Sidebar container */
+/* Sidebar container - unified card */
 .sidebar {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
 }
 
-/* Sidebar card base styles */
+/* Unified sidebar card */
 .sidebar-card {
   background-color: var(--bg-secondary);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
+  padding: var(--spacing-xl);
   box-shadow: 0 2px 8px var(--shadow);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
 }
 
-.sidebar-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-light) 100%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.sidebar-card:hover {
-  box-shadow: 0 4px 16px var(--shadow-hover);
-  transform: translateY(-2px);
-}
-
-.sidebar-card:hover::before {
-  opacity: 1;
-}
-
-/* Author card */
+/* Author section */
 .author-card {
   text-align: center;
-  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
 }
 
-.author-card::before {
-  background: linear-gradient(90deg, var(--accent) 0%, var(--text-secondary) 50%, var(--accent) 100%);
+.author-card:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 .author-avatar {
-  width: 88px;
-  height: 88px;
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: var(--spacing-md);
-  border: 3px solid var(--border);
-  box-shadow: 0 4px 12px var(--shadow);
-  transition: all 0.3s ease;
-}
-
-.author-card:hover .author-avatar {
-  transform: scale(1.05);
-  box-shadow: 0 6px 16px var(--shadow-hover);
+  border: 2px solid var(--border);
 }
 
 .author-name {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: var(--spacing-sm);
@@ -164,25 +141,18 @@ body {
   line-height: 1.6;
 }
 
-/* Featured posts card */
+/* Featured posts section */
+.featured-card {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
 .sidebar-title {
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--accent);
-  margin-bottom: var(--spacing-md);
-  padding-bottom: var(--spacing-sm);
-  border-bottom: 2px solid var(--border);
-  position: relative;
-}
-
-.featured-card .sidebar-title::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 40px;
-  height: 2px;
-  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-light) 100%);
+  margin-bottom: var(--spacing-lg);
 }
 
 .featured-list {
@@ -191,22 +161,6 @@ body {
 
 .featured-item {
   margin-bottom: var(--spacing-md);
-  position: relative;
-  padding-left: var(--spacing-md);
-}
-
-.featured-item::before {
-  content: '▹';
-  position: absolute;
-  left: 0;
-  color: var(--accent);
-  font-size: 1.2rem;
-  transition: all 0.2s ease;
-}
-
-.featured-item:hover::before {
-  transform: translateX(2px);
-  color: var(--text-secondary);
 }
 
 .featured-item:last-child {
@@ -216,14 +170,11 @@ body {
 .featured-link {
   display: block;
   text-decoration: none;
-  padding: var(--spacing-sm);
-  border-radius: var(--radius-sm);
-  transition: all 0.2s;
+  transition: opacity 0.2s;
 }
 
 .featured-link:hover {
-  background-color: var(--bg-tertiary);
-  transform: translateX(2px);
+  opacity: 0.7;
 }
 
 .featured-title {
@@ -362,6 +313,13 @@ body {
   line-height: 1.6;
 }
 
+.post-item-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
 .read-more {
   color: var(--accent);
   text-decoration: none;
@@ -375,8 +333,17 @@ body {
 
 /* Single Post */
 .post {
-  max-width: 720px;
+  max-width: 100%;
   margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 220px;
+  gap: var(--spacing-2xl);
+  align-items: start;
+}
+
+.post-main {
+  grid-column: 1;
+  min-width: 0; /* Allow content to shrink properly */
 }
 
 .post-header {
@@ -429,21 +396,48 @@ body {
 }
 
 .post-content h2 {
-  font-size: 1.8rem;
-  font-weight: 600;
-  margin-top: var(--spacing-2xl);
-  margin-bottom: var(--spacing-md);
-  letter-spacing: -0.01em;
-  padding-bottom: var(--spacing-sm);
-  border-bottom: 1px solid var(--border);
+  font-size: 1.5rem;
+  font-weight: 650;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  letter-spacing: -0.015em;
+  line-height: 1.4;
+  padding-bottom: 0.6rem;
+  border-bottom: 2px solid var(--border);
+  position: relative;
+}
+
+.post-content h2::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 60px;
+  height: 2px;
+  background-color: var(--accent);
 }
 
 .post-content h3 {
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   font-weight: 600;
-  margin-top: var(--spacing-xl);
-  margin-bottom: var(--spacing-sm);
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
   color: var(--accent);
+  position: relative;
+  padding-left: 1rem;
+}
+
+.post-content h3::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.2rem;
+  bottom: 0.2rem;
+  width: 3px;
+  background-color: var(--border);
+  border-radius: 2px;
 }
 
 .post-content h4 {
@@ -452,6 +446,85 @@ body {
   margin-top: var(--spacing-lg);
   margin-bottom: var(--spacing-sm);
   color: var(--text-secondary);
+}
+
+/* Table of Contents - Sidebar */
+.post-sidebar {
+  grid-column: 2;
+  position: sticky;
+  top: var(--spacing-2xl);
+  max-height: calc(100vh - var(--spacing-2xl) * 2);
+  overflow-y: auto;
+}
+
+.post-toc {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  box-shadow: 0 2px 8px var(--shadow);
+}
+
+.post-toc-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: var(--spacing-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-bottom: var(--spacing-xs);
+  border-bottom: 1px solid var(--border);
+}
+
+.post-toc-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.post-toc-list .toc-item {
+  margin-bottom: 2px;
+}
+
+.post-toc-list .toc-item:last-child {
+  margin-bottom: 0;
+}
+
+.post-toc-list .toc-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  display: block;
+  padding: 4px var(--spacing-sm);
+  border-left: 2px solid var(--border);
+  transition: all 0.2s;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.post-toc-list .toc-link:hover {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  background-color: var(--bg-tertiary);
+}
+
+.post-toc-list .toc-link.active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  font-weight: 500;
+}
+
+.post-toc-list .toc-sublist {
+  list-style: none;
+  padding-left: var(--spacing-sm);
+  margin-top: 2px;
+}
+
+.post-toc-list .toc-sublist .toc-link {
+  font-size: 0.75rem;
+  border-left-width: 1px;
+  padding: 3px var(--spacing-sm);
 }
 
 .post-content p {
@@ -508,6 +581,7 @@ body {
   line-height: 1.6;
   box-shadow: 0 2px 8px var(--shadow);
   position: relative;
+  max-width: 100%;
 }
 
 .post-content code {
@@ -531,6 +605,9 @@ body {
   box-shadow: 0 2px 8px var(--shadow);
   border-radius: var(--radius-md);
   overflow: hidden;
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .post-content th,
@@ -686,6 +763,13 @@ body {
 }
 
 /* Responsive Design */
+@media (max-width: 1280px) {
+  .post {
+    grid-template-columns: 1fr 200px;
+    gap: var(--spacing-xl);
+  }
+}
+
 @media (max-width: 1024px) {
   .home-grid {
     grid-template-columns: 1fr;
@@ -698,6 +782,18 @@ body {
 
   .sidebar-card {
     margin-bottom: var(--spacing-md);
+  }
+
+  .post {
+    grid-template-columns: 1fr;
+  }
+
+  .post-main {
+    grid-column: 1;
+  }
+
+  .post-sidebar {
+    display: none;
   }
 }
 
@@ -789,8 +885,9 @@ body {
           
         </header>
 
-        <div class="post-content">
-          <p><strong>背景</strong>：用户每天应用切换超过100次，重启延迟是关键体验指标，厂商以&quot;保活几十个APP&quot;为卖点。实际上数据显示用户日均使用APP不超过7个，<strong>核心体验重于保活数量</strong></p>
+        <div class="post-main">
+          <div class="post-content">
+            <p><strong>背景</strong>：用户每天应用切换超过100次，重启延迟是关键体验指标，厂商以&quot;保活几十个APP&quot;为卖点。实际上数据显示用户日均使用APP不超过7个，<strong>核心体验重于保活数量</strong></p>
 <p>基础内存回收策略：杀进程（进程终止，冷启动，用户体验差），换页到闪存（慢速IO），写入损耗闪存寿命（SWAP方案）</p>
 <p>ZRAM：<strong>在DRAM内部创建透明压缩的虚拟存储层，把数据压缩后</strong>仍在内存里待着。LRU只认最近使用，但是有些数据是打开APP时必用的，ZRAM可能把这些热数据也压缩了，导致每次打开都解压，<strong>明明不解压也能放得下</strong>。</p>
 <p>文章发现ZRAM技术有三大缺陷</p>
@@ -848,7 +945,7 @@ body {
 <li>基于数据被压缩之前一段时间内的访问频率把数据分成热，温，冷数据</li>
 </ol>
 <p>理想情况下，Part 0中应该是“冷”数据占绝对主导，Part 9中应该是“热”数据占绝对主导。但是这几个软件即使在Part 0也有大量热数据。这是因为LRU是一种<strong>被动反应型</strong>算法，只记录历史，不做预测。它无法知道用户<strong>接下来最可能打开哪个应用</strong>，或者一个后台应用<strong>哪些数据正在被服务（如音乐播放、消息同步）</strong>。这引发了频繁且不必要的解压操作，是造成<strong>应用重启延迟高</strong>和<strong>CPU占用高</strong>的根本原因。作者提出的Ariadne策略不再将内存压缩视为一个被动的、无差别的紧急救援手段，而是一种主动的，预测性的，分层的内存资源调度策略。</p>
-<p>由这个实验，揭示了当前的ZRAM（使用LRU算法）在置换数据时**完全无法区分冷热数据，如果要设计一个能区别冷热数据的方法，就得找出热数据的规律和特征，文章接下来就对这个问题进行了研究（研究了同一应用在连续两次重启之间相同热数据的百分比）：研究发现同一应用连续两次重启间的平均热数据相似度为70%，平均数据复用率达到98%</p>
+<p>由这个实验，揭示了当前的ZRAM（使用LRU算法）在置换数据时<strong>完全无法区分冷热数据</strong>，如果要设计一个能区别冷热数据的方法，就得找出热数据的规律和特征，文章接下来就对这个问题进行了研究（研究了同一应用在连续两次重启之间相同热数据的百分比）：研究发现同一应用连续两次重启间的平均热数据相似度为70%，平均数据复用率达到98%</p>
 <p>这样就找到了热数据的规律：一次重启中的热数据极有可能在后续重启中再次成为热数据或温数据。</p>
 <p>总结：</p>
 <p>Ariadne 依据数据的热度等级动态调整压缩块尺寸，并基于数据访问的局部性特征实施前瞻性解压</p>
@@ -860,6 +957,9 @@ body {
 <p>Ariadne将匿名内存数据分为热数据，温数据，冷数据，是动态的预测性的划分。系统为热、温、冷数据分别维护独立的LRU链表，实现物理和逻辑上的隔离管理。</p>
 <p>该方法对数据的划分并非完全依赖历史，甚至还结合了<strong>空间局部性预测</strong>。比如当系统因空间局部性预取一个温数据页并命中后，会强化该页及其相邻页的“温”属性评估。</p>
 
+          </div>
+
+          
         </div>
 
         
