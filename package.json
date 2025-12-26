@@ -14,7 +14,7 @@
   "license": "MIT",
   "dependencies": {
     "marked": "^15.0.4",
-    "highlight.js": "^11.10.0",
+    "highlight.js": "^11.11.1",
     "front-matter": "^4.0.2",
     "fs-extra": "^11.2.0",
     "chokidar": "^4.0.3",
