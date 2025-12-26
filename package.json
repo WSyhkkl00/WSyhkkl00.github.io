@@ -18,7 +18,7 @@
     "front-matter": "^4.0.2",
     "fs-extra": "^11.2.0",
     "chokidar": "^4.0.3",
-    "express": "^4.21.2",
+    "express": "^5.2.1",
     "gray-matter": "^4.0.3"
   },
   "devDependencies": {
