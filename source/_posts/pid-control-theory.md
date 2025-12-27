@@ -2,13 +2,14 @@
 title: 自动控制原理：PID控制器详解
 date: 2025-12-26 16:00
 categories:
-  - 自动控制
   - 控制理论
 tags:
   - PID控制
-  - 自动化
   - 反馈控制
   - 系统设计
+  - 参数整定
+  - 积分饱和
+  - 增量式PID
 featured: true
 ---
 

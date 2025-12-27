@@ -3,12 +3,14 @@ title: 计算机网络：深入理解TCP/IP协议栈
 date: 2025-12-26 15:00
 categories:
   - 计算机网络
-  - 网络协议
 tags:
   - TCP/IP
   - 网络编程
   - 协议栈
   - Socket
+  - 三次握手
+  - 流量控制
+  - 网络优化
 featured: true
 ---
 

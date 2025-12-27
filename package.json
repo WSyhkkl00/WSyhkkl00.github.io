@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "A minimalist static blog generator for GitHub Pages",
   "main": "index.js",
+  "bin": {
+    "shiori": "./cli.js"
+  },
   "scripts": {
     "build": "node cli.js build",
     "preview": "node cli.js preview",

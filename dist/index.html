@@ -753,6 +753,112 @@ body.post-page .container {
   color: var(--accent);
 }
 
+/* Categories List */
+.categories-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.category-item {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  transition: all 0.2s;
+}
+
+.category-item:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 12px var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+.category-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-decoration: none;
+  color: var(--text-primary);
+}
+
+.category-name {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.category-count {
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-family: "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.category-item:hover .category-name {
+  color: var(--accent);
+}
+
+.category-item:hover .category-count {
+  background-color: var(--accent);
+  color: var(--bg-secondary);
+}
+
+/* Tags List */
+.tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-lg);
+}
+
+.tag-item {
+  display: inline-block;
+}
+
+.tag-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: all 0.2s;
+}
+
+.tag-link:hover {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg-secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow-hover);
+}
+
+.tag-name {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.tag-count {
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  padding: 2px var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-family: "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.tag-link:hover .tag-count {
+  background-color: var(--bg-secondary);
+  color: var(--accent);
+}
+
 /* Footer */
 .site-footer {
   padding: var(--spacing-xl) 0;
@@ -886,7 +992,7 @@ body.post-page .container {
         </header>
         
         <div class="post-item-tags">
-          <a href="/tags/操作系统/" class="tag">#操作系统</a><a href="/tags/Android/" class="tag">#Android</a><a href="/tags/内存/" class="tag">#内存</a>
+          <a href="/tags/Android/" class="tag">#Android</a><a href="/tags/内存管理/" class="tag">#内存管理</a><a href="/tags/ZRAM/" class="tag">#ZRAM</a><a href="/tags/应用保活/" class="tag">#应用保活</a><a href="/tags/性能优化/" class="tag">#性能优化</a><a href="/tags/LRU算法/" class="tag">#LRU算法</a>
         </div>
         
       </article>
@@ -900,7 +1006,7 @@ body.post-page .container {
         </header>
         
         <div class="post-item-tags">
-          <a href="/tags/PID控制/" class="tag">#PID控制</a><a href="/tags/自动化/" class="tag">#自动化</a><a href="/tags/反馈控制/" class="tag">#反馈控制</a><a href="/tags/系统设计/" class="tag">#系统设计</a>
+          <a href="/tags/PID控制/" class="tag">#PID控制</a><a href="/tags/反馈控制/" class="tag">#反馈控制</a><a href="/tags/系统设计/" class="tag">#系统设计</a><a href="/tags/参数整定/" class="tag">#参数整定</a><a href="/tags/积分饱和/" class="tag">#积分饱和</a><a href="/tags/增量式PID/" class="tag">#增量式PID</a>
         </div>
         
       </article>
@@ -914,7 +1020,7 @@ body.post-page .container {
         </header>
         
         <div class="post-item-tags">
-          <a href="/tags/TCP/IP/" class="tag">#TCP/IP</a><a href="/tags/网络编程/" class="tag">#网络编程</a><a href="/tags/协议栈/" class="tag">#协议栈</a><a href="/tags/Socket/" class="tag">#Socket</a>
+          <a href="/tags/TCP/IP/" class="tag">#TCP/IP</a><a href="/tags/网络编程/" class="tag">#网络编程</a><a href="/tags/协议栈/" class="tag">#协议栈</a><a href="/tags/Socket/" class="tag">#Socket</a><a href="/tags/三次握手/" class="tag">#三次握手</a><a href="/tags/流量控制/" class="tag">#流量控制</a><a href="/tags/网络优化/" class="tag">#网络优化</a>
         </div>
         
       </article>
@@ -928,7 +1034,7 @@ body.post-page .container {
         </header>
         
         <div class="post-item-tags">
-          <a href="/tags/神经科学/" class="tag">#神经科学</a><a href="/tags/生理学/" class="tag">#生理学</a>
+          <a href="/tags/奖赏系统/" class="tag">#奖赏系统</a><a href="/tags/多巴胺/" class="tag">#多巴胺</a><a href="/tags/预测误差/" class="tag">#预测误差</a><a href="/tags/成瘾机制/" class="tag">#成瘾机制</a><a href="/tags/动机理论/" class="tag">#动机理论</a>
         </div>
         
       </article>
@@ -942,7 +1048,7 @@ body.post-page .container {
         </header>
         
         <div class="post-item-tags">
-          <a href="/tags/操作系统/" class="tag">#操作系统</a><a href="/tags/进程管理/" class="tag">#进程管理</a><a href="/tags/多线程/" class="tag">#多线程</a><a href="/tags/并发编程/" class="tag">#并发编程</a>
+          <a href="/tags/进程管理/" class="tag">#进程管理</a><a href="/tags/多线程/" class="tag">#多线程</a><a href="/tags/并发编程/" class="tag">#并发编程</a><a href="/tags/进程间通信/" class="tag">#进程间通信</a><a href="/tags/线程同步/" class="tag">#线程同步</a><a href="/tags/调度算法/" class="tag">#调度算法</a>
         </div>
         
       </article>

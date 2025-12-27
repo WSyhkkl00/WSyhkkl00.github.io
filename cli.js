@@ -53,10 +53,10 @@ Usage:
   shiori new       Create a new post
 
 Examples:
-  npm run build
-  npm run preview
-  npm run serve
-  npm run new "My Post Title"
+  shiori build
+  shiori preview
+  shiori serve
+  shiori new "My Post Title"
         `);
     }
   } catch (error) {

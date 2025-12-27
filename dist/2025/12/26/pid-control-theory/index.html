@@ -753,6 +753,112 @@ body.post-page .container {
   color: var(--accent);
 }
 
+/* Categories List */
+.categories-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.category-item {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  transition: all 0.2s;
+}
+
+.category-item:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 12px var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+.category-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-decoration: none;
+  color: var(--text-primary);
+}
+
+.category-name {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.category-count {
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-family: "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.category-item:hover .category-name {
+  color: var(--accent);
+}
+
+.category-item:hover .category-count {
+  background-color: var(--accent);
+  color: var(--bg-secondary);
+}
+
+/* Tags List */
+.tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-lg);
+}
+
+.tag-item {
+  display: inline-block;
+}
+
+.tag-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: all 0.2s;
+}
+
+.tag-link:hover {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg-secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow-hover);
+}
+
+.tag-name {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.tag-count {
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  padding: 2px var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-family: "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.tag-link:hover .tag-count {
+  background-color: var(--bg-secondary);
+  color: var(--accent);
+}
+
 /* Footer */
 .site-footer {
   padding: var(--spacing-xl) 0;
@@ -884,7 +990,7 @@ body.post-page .container {
           </div>
           
           <div class="post-categories">
-            <a href="/categories/自动控制/" class="category-tag">自动控制</a><a href="/categories/控制理论/" class="category-tag">控制理论</a>
+            <a href="/categories/控制理论/" class="category-tag">控制理论</a>
           </div>
           
         </header>
@@ -1335,7 +1441,7 @@ plt.show()
           
           <footer class="post-footer">
             <div class="post-tags">
-              <a href="/tags/PID控制/" class="tag">#PID控制</a><a href="/tags/自动化/" class="tag">#自动化</a><a href="/tags/反馈控制/" class="tag">#反馈控制</a><a href="/tags/系统设计/" class="tag">#系统设计</a>
+              <a href="/tags/PID控制/" class="tag">#PID控制</a><a href="/tags/反馈控制/" class="tag">#反馈控制</a><a href="/tags/系统设计/" class="tag">#系统设计</a><a href="/tags/参数整定/" class="tag">#参数整定</a><a href="/tags/积分饱和/" class="tag">#积分饱和</a><a href="/tags/增量式PID/" class="tag">#增量式PID</a>
             </div>
           </footer>
           
