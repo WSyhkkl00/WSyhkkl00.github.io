@@ -349,11 +349,11 @@ if((pte_L0& PTE_V))
 
 ## 实验三：检测已访问的页面（困难）
 
-### **实验目标**：
+### **实验目标**
 
 实现一个系统调用 `pgaccess()`，用于检测用户页面是否被访问过。RISC-V 硬件页表遍历器在解析 TLB 缺失时会自动设置页表项中的访问位（PTE_A）。本实验需要利用这一硬件特性，向用户空间报告哪些页面曾被访问。
 
-### **实验原理**：
+### **实验原理**
 
 #### 1. RISC-V 页表访问位机制
 
@@ -377,7 +377,6 @@ RISC-V 页表项（PTE）包含两个重要的状态位：
 - 页面0被访问 → 位掩码第0位 = 1
 - 页面1未访问 → 位掩码第1位 = 0
 - 页面2被访问 → 位掩码第2位 = 1
-  结果位掩码：二进制 `101` = 十进制 `5`
 
 #### 3. 内核-用户空间数据交换
 
@@ -387,8 +386,7 @@ RISC-V 页表项（PTE）包含两个重要的状态位：
 int copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len);
 ```
 
-- **关键点**：内核不能直接解引用用户虚拟地址
-- **解决方法**：通过页表翻译，找到对应的物理地址再拷贝
+内核不能直接解引用用户虚拟地址，调用`copyout`通过页表翻译，找到对应的物理地址再拷贝
 
 ### **实现步骤**
 
@@ -401,3 +399,107 @@ int copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len);
 ```
 
 **第二步：添加系统调用框架**
+
+**用户空间声明**（`user/user.h`）
+
+```c
+int pgaccess(void *base, int len, void *mask);
+```
+
+**系统调用入口**（`user/usys.pl`）
+
+```perl
+entry("pgaccess");
+```
+
+**系统调用号**（`kernel/syscall.h`）
+
+```c
+#define SYS_pgaccess 24
+```
+
+**注册系统调用**（`kernel/syscall.c`）
+
+```c
+extern uint64 sys_pgaccess(void);
+static uint64 (*syscalls[])(void) = {
+    // ... 
+    [SYS_pgaccess] sys_pgaccess,
+};
+```
+
+**第三步：实现核心功能**
+
+在 `kernel/sysproc.c` 中实现 `sys_pgaccess()`：
+
+```c
+#ifdef LAB_PGTBL
+int sys_pgaccess(void)
+{
+    uint64 start;      // 起始虚拟地址
+    int num_pages;     // 要检查的页面数
+    uint64 mask_addr;  // 结果位掩码的用戶空间地址
+    
+    if(argaddr(0, &start) < 0 || 
+       argint(1, &num_pages) < 0 || 
+       argaddr(2, &mask_addr) < 0) {
+        return -1;  
+    }
+    
+    struct proc *p = myproc();
+    uint64 bit_mask = 0;  // 内核中的临时位掩码
+    
+    for(int i = 0; i < num_pages; i++) {
+        uint64 va = start + i * PGSIZE;
+        
+        // 查找页表项
+        pte_t *pte = walk(p->pagetable, va, 0);
+        if(pte == 0) {
+            continue;
+        }
+        
+        if(*pte & PTE_A) {
+            // 设置位掩码中对应的位
+            bit_mask |= (1ULL << i);
+            
+            // 软件清零 PTE_A 位，以便下次检测
+            *pte &= ~PTE_A;
+        }
+    }
+    
+    // 结果拷贝回用户空间
+    if(copyout(p->pagetable, mask_addr, (char*)&bit_mask, sizeof(bit_mask)) < 0) {
+        return -1;  // 拷贝失败
+    }
+    
+    return 0;  // 成功
+}
+#endif
+```
+
+### 思考
+
+#### 本实验与LRU算法的关系
+
+LRU算法通过追踪每个页面的最后访问时间来确定淘汰候选者。该算法为每个已分配的物理页面维护一个时间戳，记录其最近一次被访问的时刻。每当发生内存访问时，算法立即更新对应页面的时间戳以反映当前访问时间。
+
+在需要执行页面替换时，LRU 算法遍历所有页面，选择时间戳最早的页面——即最久未被访问的页面——作为淘汰目标进行替换
+
+在本实验中实现了读取PTE_A访问位的系统调用`pgaccess()`，能够检测哪些页面在最近时间段内被访问过。
+
+而LRU算法依赖类似的机制获取页面访问信息。Linux内核定期扫描所有页面，检查每个页表项的访问位（相当于PTE_A），以此判断页面是否最近被访问。
+
+本实验中返回一个位掩码，每位表示对应页面是否被访问过。
+
+而LRU算法基于访问位的检查结果，将页面分为"活跃"和"非活跃"两类链表。活跃链表中的页面最近被访问过，非活跃链表中的页面较长时间未被访问。
+
+#### 为什么硬件只置1不清零？
+
+硬件设计的核心是**确定性、简单性、高性能**。清零操作涉及复杂的策略决策（不同的操作系统、甚至同一系统的不同场景，需要不同的清零策略），比如
+
+- 页面是否应该老化？
+- 系统当前内存压力如何？
+- 这是用户页面还是内核页面？
+- 页面属于哪个进程？
+
+清零是一个需要系统全局知识、策略决策和灵活时机的操作，这些超出了硬件的能力和职责范围。

@@ -986,7 +986,7 @@ body.post-page .container {
           <div class="post-meta">
             <time datetime="2026-01-03">2026-01-03</time>
             <span class="post-author">by WSyhkkl00</span>
-            <span class="post-reading-time">4 min read</span>
+            <span class="post-reading-time">5 min read</span>
           </div>
           
           <div class="post-categories">
@@ -1282,9 +1282,9 @@ freeproc(struct proc *p)
 <p>因为L0（第三级）页表直接包含叶子PTE（<strong>叶子PTE是页表中直接指向用户数据/代码页面的页表项，是地址转换的&quot;终点站&quot;。</strong>），这些PTE必须有R/W/X标志位才能被用户访问。如果L0的PTE没有R/W/X，那么它要么无效（PTE_V=0），要么是错误的页表结构。</p>
 <p>而且硬件要求用户页面必须有R/W/X才能访问，因此：正常的L0 PTE一定有R/W/X，所以不需要额外检查，检查PTE_V就够了</p>
 <h2 id="实验三检测已访问的页面困难">实验三：检测已访问的页面（困难）</h2>
-<h3 id="实验目标"><strong>实验目标</strong>：</h3>
+<h3 id="实验目标"><strong>实验目标</strong></h3>
 <p>实现一个系统调用 <code>pgaccess()</code>，用于检测用户页面是否被访问过。RISC-V 硬件页表遍历器在解析 TLB 缺失时会自动设置页表项中的访问位（PTE_A）。本实验需要利用这一硬件特性，向用户空间报告哪些页面曾被访问。</p>
-<h3 id="实验原理"><strong>实验原理</strong>：</h3>
+<h3 id="实验原理"><strong>实验原理</strong></h3>
 <h4>1. RISC-V 页表访问位机制</h4>
 <p>RISC-V 页表项（PTE）包含两个重要的状态位：</p>
 <ul>
@@ -1303,22 +1303,97 @@ freeproc(struct proc *p)
 <ul>
 <li>页面0被访问 → 位掩码第0位 = 1</li>
 <li>页面1未访问 → 位掩码第1位 = 0</li>
-<li>页面2被访问 → 位掩码第2位 = 1<br>结果位掩码：二进制 <code>101</code> = 十进制 <code>5</code></li>
+<li>页面2被访问 → 位掩码第2位 = 1</li>
 </ul>
 <h4>3. 内核-用户空间数据交换</h4>
 <p>使用 <code>copyout()</code> 函数安全地将内核数据拷贝到用户空间：</p>
 <pre><code class="language-c">int copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len);
 </code></pre>
-<ul>
-<li><strong>关键点</strong>：内核不能直接解引用用户虚拟地址</li>
-<li><strong>解决方法</strong>：通过页表翻译，找到对应的物理地址再拷贝</li>
-</ul>
+<p>内核不能直接解引用用户虚拟地址，调用<code>copyout</code>通过页表翻译，找到对应的物理地址再拷贝</p>
 <h3 id="实现步骤"><strong>实现步骤</strong></h3>
 <p><strong>第一步：定义 PTE_A 访问位</strong></p>
 <p>在 <code>kernel/riscv.h</code> 中添加定义（根据 RISC-V 手册，PTE_A 是第 6 位）：</p>
 <pre><code class="language-c">#define PTE_A (1L &lt;&lt; 6)  // 访问位
 </code></pre>
 <p><strong>第二步：添加系统调用框架</strong></p>
+<p><strong>用户空间声明</strong>（<code>user/user.h</code>）</p>
+<pre><code class="language-c">int pgaccess(void *base, int len, void *mask);
+</code></pre>
+<p><strong>系统调用入口</strong>（<code>user/usys.pl</code>）</p>
+<pre><code class="language-perl">entry(&quot;pgaccess&quot;);
+</code></pre>
+<p><strong>系统调用号</strong>（<code>kernel/syscall.h</code>）</p>
+<pre><code class="language-c">#define SYS_pgaccess 24
+</code></pre>
+<p><strong>注册系统调用</strong>（<code>kernel/syscall.c</code>）</p>
+<pre><code class="language-c">extern uint64 sys_pgaccess(void);
+static uint64 (*syscalls[])(void) = {
+    // ... 
+    [SYS_pgaccess] sys_pgaccess,
+};
+</code></pre>
+<p><strong>第三步：实现核心功能</strong></p>
+<p>在 <code>kernel/sysproc.c</code> 中实现 <code>sys_pgaccess()</code>：</p>
+<pre><code class="language-c">#ifdef LAB_PGTBL
+int sys_pgaccess(void)
+{
+    uint64 start;      // 起始虚拟地址
+    int num_pages;     // 要检查的页面数
+    uint64 mask_addr;  // 结果位掩码的用戶空间地址
+    
+    if(argaddr(0, &amp;start) &lt; 0 || 
+       argint(1, &amp;num_pages) &lt; 0 || 
+       argaddr(2, &amp;mask_addr) &lt; 0) {
+        return -1;  
+    }
+    
+    struct proc *p = myproc();
+    uint64 bit_mask = 0;  // 内核中的临时位掩码
+    
+    for(int i = 0; i &lt; num_pages; i++) {
+        uint64 va = start + i * PGSIZE;
+        
+        // 查找页表项
+        pte_t *pte = walk(p-&gt;pagetable, va, 0);
+        if(pte == 0) {
+            continue;
+        }
+        
+        if(*pte &amp; PTE_A) {
+            // 设置位掩码中对应的位
+            bit_mask |= (1ULL &lt;&lt; i);
+            
+            // 软件清零 PTE_A 位，以便下次检测
+            *pte &amp;= ~PTE_A;
+        }
+    }
+    
+    // 结果拷贝回用户空间
+    if(copyout(p-&gt;pagetable, mask_addr, (char*)&amp;bit_mask, sizeof(bit_mask)) &lt; 0) {
+        return -1;  // 拷贝失败
+    }
+    
+    return 0;  // 成功
+}
+#endif
+</code></pre>
+<h3 id="思考">思考</h3>
+<h4>本实验与LRU算法的关系</h4>
+<p>LRU算法通过追踪每个页面的最后访问时间来确定淘汰候选者。该算法为每个已分配的物理页面维护一个时间戳，记录其最近一次被访问的时刻。每当发生内存访问时，算法立即更新对应页面的时间戳以反映当前访问时间。</p>
+<p>在需要执行页面替换时，LRU 算法遍历所有页面，选择时间戳最早的页面——即最久未被访问的页面——作为淘汰目标进行替换</p>
+<p>在本实验中实现了读取PTE_A访问位的系统调用<code>pgaccess()</code>，能够检测哪些页面在最近时间段内被访问过。</p>
+<p>而LRU算法依赖类似的机制获取页面访问信息。Linux内核定期扫描所有页面，检查每个页表项的访问位（相当于PTE_A），以此判断页面是否最近被访问。</p>
+<p>本实验中返回一个位掩码，每位表示对应页面是否被访问过。</p>
+<p>而LRU算法基于访问位的检查结果，将页面分为&quot;活跃&quot;和&quot;非活跃&quot;两类链表。活跃链表中的页面最近被访问过，非活跃链表中的页面较长时间未被访问。</p>
+<h4>为什么硬件只置1不清零？</h4>
+<p>硬件设计的核心是<strong>确定性、简单性、高性能</strong>。清零操作涉及复杂的策略决策（不同的操作系统、甚至同一系统的不同场景，需要不同的清零策略），比如</p>
+<ul>
+<li>页面是否应该老化？</li>
+<li>系统当前内存压力如何？</li>
+<li>这是用户页面还是内核页面？</li>
+<li>页面属于哪个进程？</li>
+</ul>
+<p>清零是一个需要系统全局知识、策略决策和灵活时机的操作，这些超出了硬件的能力和职责范围。</p>
 
           </div>
 
@@ -1336,7 +1411,7 @@ freeproc(struct proc *p)
           <nav class="post-toc">
             <div class="post-toc-title">目录</div>
             <ul class="post-toc-list">
-              <li class="toc-item"><a href="#实验一加速系统调用简单" class="toc-link">实验一：加速系统调用（简单）</a><ul class="toc-sublist"><li class="toc-item"><a href="#实验目标" class="toc-link">实验目标</a></li><li class="toc-item"><a href="#实验原理" class="toc-link">实验原理</a></li><li class="toc-item"><a href="#实现步骤" class="toc-link">实现步骤</a></li><li class="toc-item"><a href="#思考" class="toc-link">思考</a></li></ul></li><li class="toc-item"><a href="#实验二打印页表简单" class="toc-link">实验二：打印页表（简单）</a><ul class="toc-sublist"><li class="toc-item"><a href="#实验目标" class="toc-link">实验目标</a></li><li class="toc-item"><a href="#实验原理" class="toc-link">实验原理</a></li><li class="toc-item"><a href="#实现步骤" class="toc-link">实现步骤</a></li><li class="toc-item"><a href="#思考" class="toc-link">思考</a></li></ul></li><li class="toc-item"><a href="#实验三检测已访问的页面困难" class="toc-link">实验三：检测已访问的页面（困难）</a><ul class="toc-sublist"><li class="toc-item"><a href="#实验目标" class="toc-link">实验目标：</a></li><li class="toc-item"><a href="#实验原理" class="toc-link">实验原理：</a></li><li class="toc-item"><a href="#实现步骤" class="toc-link">实现步骤</a></li></ul></li>
+              <li class="toc-item"><a href="#实验一加速系统调用简单" class="toc-link">实验一：加速系统调用（简单）</a><ul class="toc-sublist"><li class="toc-item"><a href="#实验目标" class="toc-link">实验目标</a></li><li class="toc-item"><a href="#实验原理" class="toc-link">实验原理</a></li><li class="toc-item"><a href="#实现步骤" class="toc-link">实现步骤</a></li><li class="toc-item"><a href="#思考" class="toc-link">思考</a></li></ul></li><li class="toc-item"><a href="#实验二打印页表简单" class="toc-link">实验二：打印页表（简单）</a><ul class="toc-sublist"><li class="toc-item"><a href="#实验目标" class="toc-link">实验目标</a></li><li class="toc-item"><a href="#实验原理" class="toc-link">实验原理</a></li><li class="toc-item"><a href="#实现步骤" class="toc-link">实现步骤</a></li><li class="toc-item"><a href="#思考" class="toc-link">思考</a></li></ul></li><li class="toc-item"><a href="#实验三检测已访问的页面困难" class="toc-link">实验三：检测已访问的页面（困难）</a><ul class="toc-sublist"><li class="toc-item"><a href="#实验目标" class="toc-link">实验目标</a></li><li class="toc-item"><a href="#实验原理" class="toc-link">实验原理</a></li><li class="toc-item"><a href="#实现步骤" class="toc-link">实现步骤</a></li><li class="toc-item"><a href="#思考" class="toc-link">思考</a></li></ul></li>
             </ul>
           </nav>
         </aside>
