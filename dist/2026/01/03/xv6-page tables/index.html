@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Android设备内存管理与应用保活机制（论文阅读） - Shiori Blog</title>
+  <title>MIT6.s081 2021 Lab3-Page Table 实验记录 - Shiori Blog</title>
   <style>/*
  * Shiori Minimalist Theme
  * A clean, technical blog style with gray, white, beige, and black colors
@@ -982,11 +982,11 @@ body.post-page .container {
     <main class="main-content">
       <article class="post">
         <header class="post-header">
-          <h1 class="post-title">Android设备内存管理与应用保活机制（论文阅读）</h1>
+          <h1 class="post-title">MIT6.s081 2021 Lab3-Page Table 实验记录</h1>
           <div class="post-meta">
-            <time datetime="2025-12-26">2025-12-26</time>
+            <time datetime="2026-01-03">2026-01-03</time>
             <span class="post-author">by WSyhkkl00</span>
-            <span class="post-reading-time">1 min read</span>
+            <span class="post-reading-time">4 min read</span>
           </div>
           
           <div class="post-categories">
@@ -997,106 +997,335 @@ body.post-page .container {
 
         <div class="post-main">
           <div class="post-content">
-            <h3 id="论文阅读ariadne的数据三级划分机制动态预测与隔离管理"><strong>论文阅读：Ariadne的数据三级划分机制：动态、预测与隔离管理</strong></h3>
-<p>在深入分析Ariadne的划分逻辑之前，我们需要先回顾其技术背景。Ariadne的诞生是为了解决ZRAM在移动设备上存在的三大根本缺陷：未区分冷热数据、未适配压缩块大小、未利用数据局部性。正是这些缺陷导致了应用重启延迟增加和CPU资源的浪费。Ariadne通过建立一套精细的三级数据划分体系，为后续的优化策略提供了基础支撑。</p>
-<h4><strong>一、 背景：传统内存管理的局限性</strong></h4>
-<p>传统Linux内核（包括Android）使用基于LRU的双链表内存管理方案：</p>
-<ul>
-<li><strong>活跃链表</strong>：存放最近被访问的页面，被视为“热”数据</li>
-<li><strong>非活跃链表</strong>：存放近期未被访问的页面，被视为“冷”数据</li>
-</ul>
-<p>这种简单二分法存在明显问题：它仅依赖历史访问时间做判断，无法识别哪些数据是“应用启动时必须的热数据”，哪些是“真正不会再用的冷数据”。研究数据显示，在ZRAM最先压缩的数据（Part 0）中，竟包含了高达20%-40%的实际热数据，这正是LRU算法在移动多任务场景下失效的直接证据。</p>
-<h4><strong>二、 划分依据：从被动记录到主动预测的转变</strong></h4>
-<p>Ariadne的划分方法不再是简单的“最近是否被访问”，而是形成了<strong>历史访问+行为预测</strong>的综合判断体系。</p>
-<p><strong>1. 基于启动行为的核心热数据识别</strong><br>研究发现：同一应用连续两次重启时，热数据的相似度达70%，复用率高达98%。Ariadne充分利用这一规律：</p>
-<ul>
-<li><strong>启动时刻标记</strong>：当应用被启动时，所有在这个过程中被访问的页面（应用框架、主界面、当前状态数据）被直接标记为<strong>热数据</strong></li>
-<li><strong>这形成了热度的“黄金标准”</strong>：上次启动必须用的数据，下次启动大概率还是必须的</li>
-</ul>
-<p><strong>2. 基于持续访问的实时热度调整</strong><br>与传统机制类似，Ariadne仍通过硬件访问位追踪页面活跃度：</p>
-<ul>
-<li>在后台运行时被访问的页面会从冷链表“升温”</li>
-<li>长时间未被访问的页面会逐渐“降温”</li>
-<li>但这只是基础调节，不是主要判断依据</li>
-</ul>
-<p><strong>3. 基于空间局部性的前瞻性预测（关键创新）</strong><br>这是Ariadne超越传统方法的核心所在。论文发现：从zpool读取数据时，访问连续页的概率极高（YouTube达86%）。Ariadne利用这一规律：</p>
-<ul>
-<li><strong>预取即预测</strong>：当系统需要解压某个页面时，会同时预取其相邻页面</li>
-<li><strong>预取行为本身就是热度信号</strong>：被预取的页面即使尚未被实际请求，系统也认为它们“很可能即将被使用”</li>
-<li><strong>命中强化机制</strong>：如果预取的页面随后真的被访问了（命中），系统会：<ol>
-<li>强化该页面本身的“温”属性</li>
-<li>将该页面所在区域的相邻页面也标记为具有潜在热度</li>
-<li>在未来的内存回收决策中，这些页面会被更谨慎地对待</li>
-</ol>
-</li>
-</ul>
-<p>这种机制创造了一个良性循环：准确的预取带来更高的命中率，高命中率又让系统更信任空间局部性预测，从而做出更准确的划分决策。</p>
-<h4><strong>三、 三级数据的具体定义与管理策略</strong></h4>
-<p><strong>热数据</strong></p>
-<ul>
-<li><strong>定义</strong>：最近一次应用启动时必须的核心数据 + 当前正在被频繁访问的关键数据</li>
-<li><strong>管理策略</strong>：永远保持未压缩状态驻留主内存</li>
-<li><strong>保护级别</strong>：最高。只在极端内存压力下才会被考虑压缩</li>
-</ul>
-<p><strong>温数据</strong></p>
-<ul>
-<li><strong>定义</strong>：近期被访问过但非核心的数据 + 基于局部性预测“即将被使用”的数据</li>
-<li><strong>管理策略</strong>：采用<strong>小尺寸压缩</strong>（如1KB/2KB块）存放于zpool，追求快速解压</li>
-<li><strong>角色</strong>：热数据的“预备队”和“缓冲区”</li>
-</ul>
-<p><strong>冷数据</strong></p>
-<ul>
-<li><strong>定义</strong>：长时间未被访问且无预测信号支持的数据</li>
-<li><strong>管理策略</strong>：采用<strong>大尺寸压缩</strong>（如16KB/32KB块）存放，可换出到闪存</li>
-<li><strong>处理原则</strong>：优先压缩和淘汰的对象</li>
-</ul>
-<h4><strong>四、 动态维护：三级链表的协同工作</strong></h4>
-<p>系统为每类数据维护独立的LRU链表，但它们的工作逻辑与传统LRU不同：</p>
+            <h2 id="实验一加速系统调用简单">实验一：加速系统调用（简单）</h2>
+<h3 id="实验目标"><strong>实验目标</strong></h3>
+<p>通过<strong>用户-内核共享内存页</strong>来加速 <code>getpid()</code> 系统调用，避免内核态切换的开销。</p>
+<h3 id="实验原理"><strong>实验原理</strong></h3>
+<h4>1.系统调用开销分析</h4>
+<p>在着手做实验之前，先对之前的实验内容进行回顾：</p>
+<p>对于传统系统调用执行流程，当用户进程执行系统调用时</p>
 <ol>
-<li><strong>热链表更新规则</strong><ul>
-<li>应用每次重新启动，旧的热数据整体降级为温数据</li>
-<li>新的启动页面集合成为新的热数据</li>
-<li>这确保了“热”总是代表“最近一次启动必须的数据”</li>
-</ul>
-</li>
-<li><strong>温/冷链表流转</strong><ul>
-<li>冷链表中被访问的页面 → 移至温链表</li>
-<li>温链表中长期未访问的页面 → 降至冷链表</li>
-<li>基于局部性预取且命中的页面 → 在温链表中获得更高优先级</li>
-</ul>
-</li>
-<li><strong>淘汰优先级</strong><ul>
-<li>严格按 <strong>冷 → 温 → 热</strong> 顺序选择压缩目标</li>
-<li>这保证了系统总是先处理“代价最低”的数据</li>
-</ul>
-</li>
+<li>用户态切换到内核态</li>
+<li>上下文保存，其中包括保存所有31个通用寄存器到 陷阱帧，切换到内核页表，切换到内核栈</li>
+<li>系统调用分发与执行，首先usertrap() 识别系统调用类型，然后<code>syscall()</code> 根据系统调用号分发，执行具体的系统调用处理函数，并且设置返回值到陷阱帧的 a0 寄存器</li>
+<li>上下文恢复与返回，<code>usertrapret()</code> 准备返回环境，<code>userret</code> 汇编代码恢复用户寄存器，执行 <code>sret</code> 指令返回用户态</li>
 </ol>
-<h4><strong>五、 为何需要这样的精细划分</strong></h4>
-<p><strong>1. 解决“一刀切”压缩的问题</strong><br>传统ZRAM对所有数据使用相同的4KB压缩块。Ariadne通过三级划分实现了：</p>
+<p>实际上，对于 <code>getpid()</code> 这类系统调用，仅需读取进程控制块中的字段（纯查询而不修改系统状态），而且可能被库函数或应用程序多次调用。我们可以改进此类方案（也就是实验题目要求）将进程PID等只读信息通过<strong>只读内存映射</strong>暴露给用户空间，使用户程序能够直接读取，规避完整的系统调用流程。</p>
+<h4>2.共享只读页</h4>
+<p>在内核中创建包含进程信息的页面，在进程创建时（<code>allocproc()</code>），内核分配一个物理页面。</p>
+<pre><code class="language-c">p-&gt;usyscall = (struct usyscall *)kalloc();
+</code></pre>
+<p><code>kalloc()</code> 从物理内存分配器获取4KB对齐的页面，返回内核虚拟地址，对应唯一的物理帧</p>
+<h4>3.用户空间映射</h4>
+<p>选择固定的用户虚拟地址 <code>USYSCALL</code>，位于用户地址空间的高端</p>
+<pre><code class="language-c">#define TRAMPOLINE (MAXVA - PGSIZE)      // 最高页：0x3ffffff000
+#define TRAPFRAME (TRAMPOLINE - PGSIZE)   // 次高页：0x3fffffe000  
+#define USYSCALL (TRAPFRAME - PGSIZE)     // 本次实验要使用的页：0x3fffffd000
+</code></pre>
+<p>将该页面映射到用户空间的固定地址（<code>USYSCALL</code>），这个地址高于用户栈顶，能避免与用户地址发生冲突。且由于是固定地址，可以在代码里编写用户库函数硬编码访问</p>
+<h4>4.直接读取</h4>
+<p>用户程序直接从共享页面读取数据，无需系统调用</p>
+<pre><code class="language-c">uint64 ugetpid(void) {
+    struct usyscall *us = (struct usyscall *)USYSCALL;
+    return us-&gt;pid;
+}
+</code></pre>
+<h3 id="实现步骤">实现步骤</h3>
+<p><strong>第一步</strong>：打开<code>memlayout.h</code>，理解其中定义的数据</p>
+<pre><code class="language-c">#define TRAMPOLINE (MAXVA - PGSIZE)      // 最高页：0x3ffffff000
+#define TRAPFRAME (TRAMPOLINE - PGSIZE)   // 次高页：0x3fffffe000  
+#define USYSCALL (TRAPFRAME - PGSIZE)     // 本次实验要使用的页：0x3fffffd000
+
+struct usyscall {
+  int pid;  // Process ID
+};
+</code></pre>
+<p><strong>第二步</strong>：修改进程结构体，新增：USYSCALL页面指针</p>
+<pre><code class="language-c">struct proc {
+  // ... 已有字段
+  struct usyscall *usyscall;  // USYSCALL页面指针
+};
+</code></pre>
+<p><strong>第三步</strong>：修改<code>allocproc</code>函数，在<code>trapframe</code>分配之后，<code>pagetable</code>创建之前创建</p>
+<pre><code class="language-c">#ifdef LAB_PGTBL
+if((p-&gt;usyscall = (struct usyscall *)kalloc()) == 0){
+    freeproc(p);
+    release(&amp;p-&gt;lock);
+    return 0;
+}
+p-&gt;usyscall-&gt;pid = p-&gt;pid;
+#endif
+#ifdef LAB_PGTBL
+if((p-&gt;usyscall = (struct usyscall *)kalloc()) == 0){
+    freeproc(p);
+    release(&amp;p-&gt;lock);
+    return 0;
+}
+p-&gt;usyscall-&gt;pid = p-&gt;pid;
+#endif
+</code></pre>
+<p><strong>第四步</strong>，建立页表映射</p>
+<p>首先打开 <code>kernel/proc.c</code>，找到 <code>proc_pagetable()</code> 函数</p>
+<pre><code class="language-c">pagetable_t
+proc_pagetable(struct proc *p)
+{
+  // ... 已有代码（建立trampoline和trapframe映射）
+  
+  // 在trapframe映射之后添加：
+#ifdef LAB_PGTBL
+  // 映射USYSCALL页面（用户只读）
+  if(mappages(pagetable, USYSCALL, PGSIZE,
+              (uint64)(p-&gt;usyscall), PTE_R | PTE_U) &lt; 0){
+    // 如果失败，需要清理已建立的映射
+    uvmunmap(pagetable, TRAPFRAME, 1, 0);
+    uvmunmap(pagetable, TRAMPOLINE, 1, 0);
+    uvmfree(pagetable, 0);
+    return 0;
+  }
+#endif
+  
+  return pagetable;
+}
+</code></pre>
+<blockquote>
+<p>[!IMPORTANT]</p>
+<p>权限标志为 <code>PTE_R | PTE_U</code>（用户可读）</p>
+</blockquote>
+<p><strong>第五步</strong>，在同一个文件中找到 <code>proc_freepagetable()</code>，添加USYSCALL映射的清理：</p>
+<pre><code class="language-c">void
+proc_freepagetable(pagetable_t pagetable, uint64 sz)
+{
+  // 移除用户内存映射
+  uvmunmap(pagetable, 0, PGROUNDUP(sz)/PGSIZE, 1);
+  // 移除TRAMPOLINE映射
+  uvmunmap(pagetable, TRAMPOLINE, 1, 0);
+  // 移除TRAPFRAME映射
+  uvmunmap(pagetable, TRAPFRAME, 1, 0);
+  
+  // 添加：移除USYSCALL映射
+#ifdef LAB_PGTBL
+  uvmunmap(pagetable, USYSCALL, 1, 0);
+#endif
+  
+  // 释放页表本身
+  freewalk(pagetable);
+}
+</code></pre>
+<p><strong>第六步</strong>，在同一个文件中找到 <code>freeproc()</code>，释放USYSCALL物理页面：</p>
+<pre><code class="language-c">static void
+freeproc(struct proc *p)
+{
+  if(p-&gt;trapframe)
+    kfree((void*)p-&gt;trapframe);
+  p-&gt;trapframe = 0;
+  
+  // 添加：释放USYSCALL页面
+#ifdef LAB_PGTBL
+  if(p-&gt;usyscall)
+    kfree((void*)p-&gt;usyscall);
+  p-&gt;usyscall = 0;
+#endif
+  
+  if(p-&gt;pagetable)
+    proc_freepagetable(p-&gt;pagetable, p-&gt;sz);
+  p-&gt;pagetable = 0;
+  
+  // ... 其他清理代码
+}
+</code></pre>
+<p>这样看来，本实验中与函数代码相关的修改遵循着“有借有还”的原则——</p>
+<pre><code class="language-tex">分配内存 (allocproc)
+   ↓        对应
+释放内存 (freeproc)
+
+建立映射 (proc_pagetable)
+   ↓        对应  
+移除映射 (proc_freepagetable)
+</code></pre>
+<h3 id="思考">思考</h3>
+<h4>1.Linux中有类似于USYSCALL的设计吗？</h4>
+<p>答案是有的，Linux不仅实现了类似USYSCALL的功能，还将其发展成了一个<strong>完整的虚拟动态共享对象（VDSO）框架</strong>。</p>
+<p>Linux最初引入的vsyscall机制与xv6的USYSCALL高度相似：</p>
 <ul>
-<li>对热数据：<strong>完全不压缩</strong> → 零解压延迟</li>
-<li>对温数据：<strong>小尺寸压缩</strong> → 快速解压</li>
-<li>对冷数据：<strong>大尺寸压缩</strong> → 高压缩率</li>
+<li><strong>固定地址映射</strong>：<code>0xffffffffff600000</code>作为所有进程共享的系统调用页</li>
+<li><strong>静态内容</strong>：包含<code>gettimeofday</code>、<code>time</code>等少数几个常用系统调用</li>
+<li><strong>直接访问</strong>：用户程序通过固定地址直接调用或读取数据</li>
 </ul>
-<p><strong>2. 匹配数据的真实价值</strong><br>不同的数据有不同的访问概率，应该有不同的处理成本：</p>
+<p>尽管vsyscall带来了性能提升，但暴露出严重问题：</p>
+<ol>
+<li>由于所有进程的 vsyscall 页面都映射到完全相同的虚拟地址，攻击者可以轻易预测关键代码的位置，为面向返回编程等攻击技术提供了便利。</li>
+<li>每个系统调用无论实际需要多少存储空间，都会独占一个完整的物理页面，通常为 4KB，而实际代码往往只有几十字节，这种粗粒度的内存管理导致了严重的空间浪费。</li>
+<li>vsyscall 的内容在内核编译时便已静态确定，无法在运行时根据不同的 CPU 特性提供优化版本，也无法灵活适应各种硬件架构的差异，这限制了其优化潜力和适用范围。</li>
+</ol>
+<p>vDSO彻底解决了vsyscall的地址固定问题：</p>
+<p>首先，vDSO 从根本上改变了共享页面的映射方式，它不再使用固定地址，而是借助<strong>地址空间布局随机化技术</strong>，为每个进程独立分配随机的加载地址。这种随机化使得攻击者无法预先得知目标代码的位置，有效增强了系统的安全性。</p>
+<p>其次，vDSO 被设计为一个标准的 ELF 格式动态共享对象，它能够像普通共享库一样参与系统的动态链接过程，从而实现了真正的动态性与灵活性。</p>
+<p>与此同时，vDSO 可以根据运行时的 CPU 特性提供最优的实现版本，并且支持以模块化的方式扩展新的加速系统调用</p>
+<h4>2.还有哪些 xv6 系统调用可以通过这个共享页面加速？请解释如何实现（题目中的思考题）</h4>
+<ol>
+<li><strong>getppid()</strong> - 父进程ID</li>
+<li><strong>getuid()/getgid()</strong> - 用户身份</li>
+<li><strong>uptime()</strong> - 系统启动时间</li>
+<li><strong>uname()</strong> - 系统信息</li>
+</ol>
+<h4>3.为什么物理页面的生命周期与页表映射的生命周期是分离的</h4>
+<p><strong>一是实现共享</strong>。同一物理页可被多个进程映射，如共享库、进程间通信。物理页需独立于任一进程的映射而存在。</p>
+<p><strong>二是支持高级功能</strong>。写时复制（COW）在fork时共享物理页，写入时才复制并更新映射。内存映射文件让文件缓存页被多进程共享。这些都需要映射可独立变更。</p>
+<p><strong>三是优化管理</strong>。操作系统可独立管理物理资源：按需调页延迟建立映射，页面缓存保留已释放映射的物理页，内存回收时只解除映射不立即释放物理页。</p>
+<p>这样设计的本质是<strong>解耦</strong>：物理页是硬件资源，映射是进程视图。分离后，操作系统能灵活调度物理内存，同时为进程提供一致的虚拟地址空间。</p>
+<h2 id="实验二打印页表简单">实验二：打印页表（简单）</h2>
+<h3 id="实验目标"><strong>实验目标</strong></h3>
+<p>实现一个函数 <code>vmprint()</code>，用于可视化 RISC-V 页表的内容。该函数将页表以层级结构的形式打印出来，帮助理解和调试页表结构。</p>
+<h3 id="实验原理"><strong>实验原理</strong></h3>
+<h4>1. RISC-V 页表结构</h4>
+<p>RISC-V 采用三级页表结构（Sv39），将 64 位虚拟地址映射到 56 位物理地址：</p>
+<pre><code>虚拟地址：| VPN[2] (9 bits) | VPN[1] (9 bits) | VPN[0] (9 bits) | offset (12 bits) |
+页表查找：顶级页表 → 二级页表 → 三级页表 → 物理页
+</code></pre>
+<p>每个页表页包含 512 个页表项（PTE），每个 PTE 8 字节。有效 PTE 的低位包含这些权限标志：</p>
 <ul>
-<li>高价值的热数据：值得占用宝贵的内存空间</li>
-<li>中等价值的温数据：值得快速访问但可以压缩</li>
-<li>低价值的冷数据：应该最大程度节省空间</li>
+<li><code>PTE_V</code>：有效位</li>
+<li><code>PTE_R</code>：可读</li>
+<li><code>PTE_W</code>：可写</li>
+<li><code>PTE_X</code>：可执行</li>
+<li><code>PTE_U</code>：用户可访问</li>
 </ul>
-<p><strong>3. 为预测性优化提供基础</strong><br>如果没有准确的热度划分，预取和主动解压就失去了意义。Ariadne的三级体系：</p>
+<h4>2.页表项标志位</h4>
+<table>
+<thead>
+<tr>
+<th>字母</th>
+<th>全称</th>
+<th>位值</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>V</strong></td>
+<td><strong>Valid</strong> (有效位)</td>
+<td><code>1L &lt;&lt; 0</code></td>
+<td>PTE是否有效</td>
+</tr>
+<tr>
+<td><strong>R</strong></td>
+<td><strong>Readable</strong> (可读)</td>
+<td><code>1L &lt;&lt; 1</code></td>
+<td>页面是否可读</td>
+</tr>
+<tr>
+<td><strong>W</strong></td>
+<td><strong>Writable</strong> (可写)</td>
+<td><code>1L &lt;&lt; 2</code></td>
+<td>页面是否可写</td>
+</tr>
+<tr>
+<td><strong>X</strong></td>
+<td><strong>eXecutable</strong> (可执行)</td>
+<td><code>1L &lt;&lt; 3</code></td>
+<td>页面是否可执行</td>
+</tr>
+<tr>
+<td><strong>U</strong></td>
+<td><strong>User-accessible</strong> (用户可访问)</td>
+<td><code>1L &lt;&lt; 4</code></td>
+<td>用户模式能否访问</td>
+</tr>
+</tbody></table>
+<h3 id="实现步骤"><strong>实现步骤</strong></h3>
+<p>太简单了直接贴代码，但是个人认为这个代码结果虽然能通过，但是逻辑冗余且硬编码，只处理了三级页表，如果页表层级变化就需要重写，后面回过头来再改一下吧</p>
+<pre><code class="language-c">void vmprint(pagetable_t pagetable) // pagetable is a pointer to the page table
+{
+  printf(&quot;page table %p\n&quot;, pagetable);
+  for(int i=0;i&lt;512;i++)
+  {
+     pte_t pte_L2 = pagetable[i];
+     if((pte_L2 &amp; PTE_V) &amp;&amp; (pte_L2 &amp; (PTE_R|PTE_W|PTE_X)) == 0)
+     {
+        uint64* child = (uint64*)PTE2PA(pte_L2);
+        printf(&quot;..%d: pte %p pa %p\n&quot;,i,pte_L2,child);
+        for (int j = 0; j &lt; 512; j++)
+        {
+          pte_t pte_L1 = child[j];
+          if((pte_L1&amp; PTE_V) &amp;&amp; (pte_L1 &amp; (PTE_R|PTE_W|PTE_X)) == 0)
+          {
+              uint64* child_ = (uint64*)PTE2PA(pte_L1);
+              printf(&quot;.. ..%d: pte %p pa %p\n&quot;,j,pte_L1,child_);
+              for (int k = 0; k &lt; 512; k++)
+              {
+                pte_t pte_L0 = child_[k];
+                if((pte_L0&amp; PTE_V))
+                {
+                  uint64* child__ = (uint64*)PTE2PA(pte_L0);
+                  printf(&quot;.. .. ..%d: pte %p pa %p\n&quot;,k,pte_L0,child__);
+                }
+
+              }
+
+          }
+        }
+       
+     }
+  }
+
+}
+</code></pre>
+<h3 id="思考">思考</h3>
+<p>个人认为在题目一完成后，题目二的实现是非常简单的</p>
+<p>只是在最后一层循环时遇到了问题</p>
+<pre><code class="language-c">if((pte_L0&amp; PTE_V))
+                {
+                  uint64* child__ = (uint64*)PTE2PA(pte_L0);
+                  printf(&quot;.. .. ..%d: pte %p pa %p\n&quot;,k,pte_L0,child__);
+                }
+</code></pre>
+<p>为什么最后一个循环不需要判断(PTE_R|PTE_W|PTE_X) == 0？</p>
+<p>因为L0（第三级）页表直接包含叶子PTE（<strong>叶子PTE是页表中直接指向用户数据/代码页面的页表项，是地址转换的&quot;终点站&quot;。</strong>），这些PTE必须有R/W/X标志位才能被用户访问。如果L0的PTE没有R/W/X，那么它要么无效（PTE_V=0），要么是错误的页表结构。</p>
+<p>而且硬件要求用户页面必须有R/W/X才能访问，因此：正常的L0 PTE一定有R/W/X，所以不需要额外检查，检查PTE_V就够了</p>
+<h2 id="实验三检测已访问的页面困难">实验三：检测已访问的页面（困难）</h2>
+<h3 id="实验目标"><strong>实验目标</strong>：</h3>
+<p>实现一个系统调用 <code>pgaccess()</code>，用于检测用户页面是否被访问过。RISC-V 硬件页表遍历器在解析 TLB 缺失时会自动设置页表项中的访问位（PTE_A）。本实验需要利用这一硬件特性，向用户空间报告哪些页面曾被访问。</p>
+<h3 id="实验原理"><strong>实验原理</strong>：</h3>
+<h4>1. RISC-V 页表访问位机制</h4>
+<p>RISC-V 页表项（PTE）包含两个重要的状态位：</p>
 <ul>
-<li>让系统知道“该预取什么”（温数据和有局部性关联的数据）</li>
-<li>让系统知道“该提前解压什么”（即将被使用的温数据）</li>
-<li>让系统知道“该保护什么”（绝对不能被换出的热数据）</li>
+<li><strong>PTE_A (Access bit)</strong>：访问位，指示页面是否被访问过（读/写/取指）</li>
+<li><strong>PTE_D (Dirty bit)</strong>：脏位，指示页面是否被修改过</li>
 </ul>
+<h4>2. 系统调用接口设计</h4>
+<p><code>pgaccess()</code> 系统调用需要三个参数：</p>
+<ol>
+<li><strong>起始虚拟地址</strong>：要检查的第一个用户页面的虚拟地址</li>
+<li><strong>页面数量</strong>：需要检查的连续页面数</li>
+<li><strong>结果缓冲区</strong>：用户空间地址，用于存储位掩码结果</li>
+</ol>
+<p><strong>位掩码格式</strong>：每个页面对应一个比特位，第一个页面对应最低有效位（LSB）。</p>
+<p>例如，检查3个页面：</p>
+<ul>
+<li>页面0被访问 → 位掩码第0位 = 1</li>
+<li>页面1未访问 → 位掩码第1位 = 0</li>
+<li>页面2被访问 → 位掩码第2位 = 1<br>结果位掩码：二进制 <code>101</code> = 十进制 <code>5</code></li>
+</ul>
+<h4>3. 内核-用户空间数据交换</h4>
+<p>使用 <code>copyout()</code> 函数安全地将内核数据拷贝到用户空间：</p>
+<pre><code class="language-c">int copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len);
+</code></pre>
+<ul>
+<li><strong>关键点</strong>：内核不能直接解引用用户虚拟地址</li>
+<li><strong>解决方法</strong>：通过页表翻译，找到对应的物理地址再拷贝</li>
+</ul>
+<h3 id="实现步骤"><strong>实现步骤</strong></h3>
+<p><strong>第一步：定义 PTE_A 访问位</strong></p>
+<p>在 <code>kernel/riscv.h</code> 中添加定义（根据 RISC-V 手册，PTE_A 是第 6 位）：</p>
+<pre><code class="language-c">#define PTE_A (1L &lt;&lt; 6)  // 访问位
+</code></pre>
+<p><strong>第二步：添加系统调用框架</strong></p>
 
           </div>
 
           
           <footer class="post-footer">
             <div class="post-tags">
-              <a href="/tags/Android/" class="tag">#Android</a><a href="/tags/内存管理/" class="tag">#内存管理</a><a href="/tags/ZRAM/" class="tag">#ZRAM</a><a href="/tags/应用保活/" class="tag">#应用保活</a><a href="/tags/性能优化/" class="tag">#性能优化</a><a href="/tags/LRU算法/" class="tag">#LRU算法</a>
+              <a href="/tags/虚拟内存/" class="tag">#虚拟内存</a><a href="/tags/xv6/" class="tag">#xv6</a><a href="/tags/内存管理/" class="tag">#内存管理</a>
             </div>
           </footer>
           
@@ -1107,7 +1336,7 @@ body.post-page .container {
           <nav class="post-toc">
             <div class="post-toc-title">目录</div>
             <ul class="post-toc-list">
-              
+              <li class="toc-item"><a href="#实验一加速系统调用简单" class="toc-link">实验一：加速系统调用（简单）</a><ul class="toc-sublist"><li class="toc-item"><a href="#实验目标" class="toc-link">实验目标</a></li><li class="toc-item"><a href="#实验原理" class="toc-link">实验原理</a></li><li class="toc-item"><a href="#实现步骤" class="toc-link">实现步骤</a></li><li class="toc-item"><a href="#思考" class="toc-link">思考</a></li></ul></li><li class="toc-item"><a href="#实验二打印页表简单" class="toc-link">实验二：打印页表（简单）</a><ul class="toc-sublist"><li class="toc-item"><a href="#实验目标" class="toc-link">实验目标</a></li><li class="toc-item"><a href="#实验原理" class="toc-link">实验原理</a></li><li class="toc-item"><a href="#实现步骤" class="toc-link">实现步骤</a></li><li class="toc-item"><a href="#思考" class="toc-link">思考</a></li></ul></li><li class="toc-item"><a href="#实验三检测已访问的页面困难" class="toc-link">实验三：检测已访问的页面（困难）</a><ul class="toc-sublist"><li class="toc-item"><a href="#实验目标" class="toc-link">实验目标：</a></li><li class="toc-item"><a href="#实验原理" class="toc-link">实验原理：</a></li><li class="toc-item"><a href="#实现步骤" class="toc-link">实现步骤</a></li></ul></li>
             </ul>
           </nav>
         </aside>
