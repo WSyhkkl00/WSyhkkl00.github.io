@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tags - Shiori Blog</title>
+  <title>MIT6.s081 2021 Lab4-Traps Optional challenge exercises 记录 - Shiori Blog</title>
   <style>/*
  * Shiori Minimalist Theme
  * A clean, technical blog style with gray, white, beige, and black colors
@@ -966,10 +966,11 @@ body.post-page .container {
 }
 </style>
 </head>
-<body class="tags-page">
+<body class="post-page">
   <div class="container">
     <header class="site-header">
       <h1 class="site-title"><a href="/">Shiori Blog</a></h1>
+      <p class="site-subtitle">A minimalist technical blog</p>
       <nav class="site-nav">
         <a href="/">Home</a>
         <a href="/archives/">Archives</a>
@@ -979,111 +980,68 @@ body.post-page .container {
     </header>
 
     <main class="main-content">
-      <h1>Tags</h1>
-      <p>Browse posts by tag</p>
-      <div class="tags-list">
-          <div class="tag-item">
-            <a href="/tags/xv6/" class="tag-link">
-              <span class="tag-name">xv6</span>
-              <span class="tag-count">3</span>
-            </a>
+      <article class="post">
+        <header class="post-header">
+          <h1 class="post-title">MIT6.s081 2021 Lab4-Traps Optional challenge exercises 记录</h1>
+          <div class="post-meta">
+            <time datetime="2026-01-04">2026-01-04</time>
+            <span class="post-author">by WSyhkkl00</span>
+            <span class="post-reading-time">1 min read</span>
           </div>
-        
-          <div class="tag-item">
-            <a href="/tags/虚拟内存/" class="tag-link">
-              <span class="tag-name">虚拟内存</span>
-              <span class="tag-count">2</span>
-            </a>
+          
+          <div class="post-categories">
+            <a href="/categories/操作系统/" class="category-tag">操作系统</a>
           </div>
-        
-          <div class="tag-item">
-            <a href="/tags/内存管理/" class="tag-link">
-              <span class="tag-name">内存管理</span>
-              <span class="tag-count">3</span>
-            </a>
+          
+        </header>
+
+        <div class="post-main">
+          <div class="post-content">
+            <h1>Optional challenge exercises</h1>
+<h2 id="题目解析">题目解析</h2>
+<p>Print the names of the functions and line numbers in <code>backtrace()</code> instead of numerical addresses</p>
+<p>在<code>backtrace()</code>中打印函数名称和行号，而不是数字地址</p>
+<p>这个确实有点难，主要是题目要求将地址转换为符号信息（函数名）和源码行号。这需要处理调试信息，而xv6本身没有内置符号表支持。</p>
+<h2 id="前置知识">前置知识</h2>
+<h3 id="调试信息来源">调试信息来源</h3>
+<p>编译器（gcc）在编译时可以用<code>-g</code>选项生成调试信息，调试信息通常以DWARF格式存储在可执行文件中，我们需要提取这些信息并建立地址到符号的映射</p>
+<h3 id="符号解析">符号解析</h3>
+<p>第一步解析<code>.symtab</code>（符号表）</p>
+<p>第二步建立按地址排序的符号数组</p>
+<p>第三步实现二分查找：给定地址，找到包含它的函数</p>
+<h2 id="思路">思路</h2>
+<p>略</p>
+<h2 id="步骤">步骤</h2>
+<p>略</p>
+<h2 id="思考">思考</h2>
+<p>略</p>
+
           </div>
-        
-          <div class="tag-item">
-            <a href="/tags/Android/" class="tag-link">
-              <span class="tag-name">Android</span>
-              <span class="tag-count">2</span>
-            </a>
-          </div>
-        
-          <div class="tag-item">
-            <a href="/tags/图形系统/" class="tag-link">
-              <span class="tag-name">图形系统</span>
-              <span class="tag-count">1</span>
-            </a>
-          </div>
-        
-          <div class="tag-item">
-            <a href="/tags/性能优化/" class="tag-link">
-              <span class="tag-name">性能优化</span>
-              <span class="tag-count">2</span>
-            </a>
-          </div>
-        
-          <div class="tag-item">
-            <a href="/tags/ZRAM/" class="tag-link">
-              <span class="tag-name">ZRAM</span>
-              <span class="tag-count">1</span>
-            </a>
-          </div>
-        
-          <div class="tag-item">
-            <a href="/tags/应用保活/" class="tag-link">
-              <span class="tag-name">应用保活</span>
-              <span class="tag-count">1</span>
-            </a>
-          </div>
-        
-          <div class="tag-item">
-            <a href="/tags/LRU算法/" class="tag-link">
-              <span class="tag-name">LRU算法</span>
-              <span class="tag-count">1</span>
-            </a>
-          </div>
-        
-          <div class="tag-item">
-            <a href="/tags/奖赏系统/" class="tag-link">
-              <span class="tag-name">奖赏系统</span>
-              <span class="tag-count">1</span>
-            </a>
-          </div>
-        
-          <div class="tag-item">
-            <a href="/tags/多巴胺/" class="tag-link">
-              <span class="tag-name">多巴胺</span>
-              <span class="tag-count">1</span>
-            </a>
-          </div>
-        
-          <div class="tag-item">
-            <a href="/tags/预测误差/" class="tag-link">
-              <span class="tag-name">预测误差</span>
-              <span class="tag-count">1</span>
-            </a>
-          </div>
-        
-          <div class="tag-item">
-            <a href="/tags/成瘾机制/" class="tag-link">
-              <span class="tag-name">成瘾机制</span>
-              <span class="tag-count">1</span>
-            </a>
-          </div>
-        
-          <div class="tag-item">
-            <a href="/tags/动机理论/" class="tag-link">
-              <span class="tag-name">动机理论</span>
-              <span class="tag-count">1</span>
-            </a>
-          </div>
+
+          
+          <footer class="post-footer">
+            <div class="post-tags">
+              <a href="/tags/xv6/" class="tag">#xv6</a>
+            </div>
+          </footer>
+          
         </div>
+
+        
+        <aside class="post-sidebar">
+          <nav class="post-toc">
+            <div class="post-toc-title">目录</div>
+            <ul class="post-toc-list">
+              <li class="toc-item"><a href="#题目解析" class="toc-link">题目解析</a></li><li class="toc-item"><a href="#前置知识" class="toc-link">前置知识</a><ul class="toc-sublist"><li class="toc-item"><a href="#调试信息来源" class="toc-link">调试信息来源</a></li><li class="toc-item"><a href="#符号解析" class="toc-link">符号解析</a></li></ul></li><li class="toc-item"><a href="#思路" class="toc-link">思路</a></li><li class="toc-item"><a href="#步骤" class="toc-link">步骤</a></li><li class="toc-item"><a href="#思考" class="toc-link">思考</a></li>
+            </ul>
+          </nav>
+        </aside>
+        
+      </article>
     </main>
 
     <footer class="site-footer">
-      <p>&copy; 2026 Shiori Blog. Powered by Shiori.</p>
+      <p>&copy; WSyhkkl00 - Powered by Shiori</p>
     </footer>
   </div>
 </body>

@@ -226,7 +226,7 @@ sret指令返回用户空间：
 
 ### 实验步骤
 
-
+略
 
 ## 警报（困难）
 
@@ -238,7 +238,7 @@ sret指令返回用户空间：
 
 ### 实验原理
 
-#### 恢复上下文
+#### 保存与恢复上下文
 
 当定时器中断发生时，需要完整保存用户程序的执行上下文。最后恢复上下文
 
@@ -249,9 +249,7 @@ sret指令返回用户空间：
 - **所有通用寄存器**：确保计算正确性
 - **内存状态**：处理函数可能修改了内存
 
-
-
-### 异步与事件驱动
+#### 异步与事件驱动
 
 同时我们需要明白以下四个概念解决的问题与体现的系统机制
 
@@ -280,9 +278,112 @@ sret指令返回用户空间：
 
 ### 实验步骤
 
+**进程结构体修改**
+
+```c
+// kernel/proc.h
+struct proc {
+  // ... 原有字段
+    
+  // alarm相关字段
+  struct trapframe alarm_trapframe;
+  int if_alarm_going;           // alarm
+  int alarm_ticks;             // ticks passed since last alarm
+  int alarm_return;
+  int alarm_interval;        	// alarm interval in ticks
+  uint64 handler_address;      // address of user-defined handler function
+};
+```
+
+**按照实验要求添加系统调用**
+
+```c
+uint64
+sys_sigalarm(void)
+{
+  int interval;
+  uint64 handler;
+
+  // get the arguments
+  if((argint(0, &interval) < 0)||
+     (argaddr(1, &handler) <0))
+   {
+    return -1;
+   } 
+
+  struct proc* p = myproc();
+  p->handler_address = handler;
+  p->alarm_ticks = interval;
+  p->alarm_interval = interval;
+  p->if_alarm_going = 0;
+  return 0;
+}
+
+uint64
+sys_sigreturn(void)
+{
+  struct proc* p = myproc();
+  memmove(p->trapframe,&p->alarm_trapframe, sizeof(struct trapframe));
+  p->if_alarm_going = 0;
+  p->alarm_ticks = p->alarm_interval;
+  printf("sigreturn called\n");
+  return 0;
+}
+```
+
+**编辑`usertrap`函数**
+
+```c
+  // give up the CPU if this is a timer interrupt.
+  if(which_dev == 2)
+  { 
+    if (p->alarm_interval)
+    {
+      p->alarm_ticks--;
+      if(!p->if_alarm_going)
+      {
+       
+        if(p->alarm_ticks<=0)
+        { 
+          p->if_alarm_going = 1;
+          memmove(&p->alarm_trapframe, p->trapframe, sizeof(struct trapframe));
+          p->trapframe->epc = p->handler_address;
+        }
+      }
+      else
+      {
+        // do nothing, prevent reentrant alarm
+      }
+    }
+    yield();
+    
+  }
+```
 
 
 
+### 思考
 
+本实验遇到了三个问题
 
+第一个是没有考虑上下文保存与恢复的完整性
+
+一开始不知道在哪里保存完整上下文（以为代码或者硬件已经帮我实现好了），只保存了epc（忽略了完整的trapframe）
+
+第二点是不知道防止重入的标志位应该去怎么用，把这个和并发编程中的锁机制混淆了
+
+犯了两种错误：
+
+1. **过早设置**：在 ticks 还没到0时就设置标志 → 死锁
+2. **过早清除**：在同一个中断处理中清除标志 → 重入
+
+第三点是赋值错误，主要是trapframe 赋值错误
+
+```c
+// 这是错误的：改变trapframe指针本身！
+p->trapframe = p->alarm_trapframe;  
+
+// 正确：复制内容
+memmove(p->trapframe, &p->alarm_trapframe, sizeof(struct trapframe));
+```
 
