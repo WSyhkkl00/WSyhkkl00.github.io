@@ -997,7 +997,7 @@ body.post-page .container {
 
         <div class="post-main">
           <div class="post-content">
-            <h2 id="实验一加速系统调用简单">实验一：加速系统调用（简单）</h2>
+            <h2 id="加速系统调用简单">加速系统调用（简单）</h2>
 <h3 id="实验目标"><strong>实验目标</strong></h3>
 <p>通过<strong>用户-内核共享内存页</strong>来加速 <code>getpid()</code> 系统调用，避免内核态切换的开销。</p>
 <h3 id="实验原理"><strong>实验原理</strong></h3>
@@ -1173,7 +1173,7 @@ freeproc(struct proc *p)
 <p><strong>二是支持高级功能</strong>。写时复制（COW）在fork时共享物理页，写入时才复制并更新映射。内存映射文件让文件缓存页被多进程共享。这些都需要映射可独立变更。</p>
 <p><strong>三是优化管理</strong>。操作系统可独立管理物理资源：按需调页延迟建立映射，页面缓存保留已释放映射的物理页，内存回收时只解除映射不立即释放物理页。</p>
 <p>这样设计的本质是<strong>解耦</strong>：物理页是硬件资源，映射是进程视图。分离后，操作系统能灵活调度物理内存，同时为进程提供一致的虚拟地址空间。</p>
-<h2 id="实验二打印页表简单">实验二：打印页表（简单）</h2>
+<h2 id="打印页表简单">打印页表（简单）</h2>
 <h3 id="实验目标"><strong>实验目标</strong></h3>
 <p>实现一个函数 <code>vmprint()</code>，用于可视化 RISC-V 页表的内容。该函数将页表以层级结构的形式打印出来，帮助理解和调试页表结构。</p>
 <h3 id="实验原理"><strong>实验原理</strong></h3>
@@ -1281,7 +1281,7 @@ freeproc(struct proc *p)
 <p>为什么最后一个循环不需要判断(PTE_R|PTE_W|PTE_X) == 0？</p>
 <p>因为L0（第三级）页表直接包含叶子PTE（<strong>叶子PTE是页表中直接指向用户数据/代码页面的页表项，是地址转换的&quot;终点站&quot;。</strong>），这些PTE必须有R/W/X标志位才能被用户访问。如果L0的PTE没有R/W/X，那么它要么无效（PTE_V=0），要么是错误的页表结构。</p>
 <p>而且硬件要求用户页面必须有R/W/X才能访问，因此：正常的L0 PTE一定有R/W/X，所以不需要额外检查，检查PTE_V就够了</p>
-<h2 id="实验三检测已访问的页面困难">实验三：检测已访问的页面（困难）</h2>
+<h2 id="检测已访问的页面困难">检测已访问的页面（困难）</h2>
 <h3 id="实验目标"><strong>实验目标</strong></h3>
 <p>实现一个系统调用 <code>pgaccess()</code>，用于检测用户页面是否被访问过。RISC-V 硬件页表遍历器在解析 TLB 缺失时会自动设置页表项中的访问位（PTE_A）。本实验需要利用这一硬件特性，向用户空间报告哪些页面曾被访问。</p>
 <h3 id="实验原理"><strong>实验原理</strong></h3>
@@ -1411,7 +1411,7 @@ int sys_pgaccess(void)
           <nav class="post-toc">
             <div class="post-toc-title">目录</div>
             <ul class="post-toc-list">
-              <li class="toc-item"><a href="#实验一加速系统调用简单" class="toc-link">实验一：加速系统调用（简单）</a><ul class="toc-sublist"><li class="toc-item"><a href="#实验目标" class="toc-link">实验目标</a></li><li class="toc-item"><a href="#实验原理" class="toc-link">实验原理</a></li><li class="toc-item"><a href="#实现步骤" class="toc-link">实现步骤</a></li><li class="toc-item"><a href="#思考" class="toc-link">思考</a></li></ul></li><li class="toc-item"><a href="#实验二打印页表简单" class="toc-link">实验二：打印页表（简单）</a><ul class="toc-sublist"><li class="toc-item"><a href="#实验目标" class="toc-link">实验目标</a></li><li class="toc-item"><a href="#实验原理" class="toc-link">实验原理</a></li><li class="toc-item"><a href="#实现步骤" class="toc-link">实现步骤</a></li><li class="toc-item"><a href="#思考" class="toc-link">思考</a></li></ul></li><li class="toc-item"><a href="#实验三检测已访问的页面困难" class="toc-link">实验三：检测已访问的页面（困难）</a><ul class="toc-sublist"><li class="toc-item"><a href="#实验目标" class="toc-link">实验目标</a></li><li class="toc-item"><a href="#实验原理" class="toc-link">实验原理</a></li><li class="toc-item"><a href="#实现步骤" class="toc-link">实现步骤</a></li><li class="toc-item"><a href="#思考" class="toc-link">思考</a></li></ul></li>
+              <li class="toc-item"><a href="#加速系统调用简单" class="toc-link">加速系统调用（简单）</a><ul class="toc-sublist"><li class="toc-item"><a href="#实验目标" class="toc-link">实验目标</a></li><li class="toc-item"><a href="#实验原理" class="toc-link">实验原理</a></li><li class="toc-item"><a href="#实现步骤" class="toc-link">实现步骤</a></li><li class="toc-item"><a href="#思考" class="toc-link">思考</a></li></ul></li><li class="toc-item"><a href="#打印页表简单" class="toc-link">打印页表（简单）</a><ul class="toc-sublist"><li class="toc-item"><a href="#实验目标" class="toc-link">实验目标</a></li><li class="toc-item"><a href="#实验原理" class="toc-link">实验原理</a></li><li class="toc-item"><a href="#实现步骤" class="toc-link">实现步骤</a></li><li class="toc-item"><a href="#思考" class="toc-link">思考</a></li></ul></li><li class="toc-item"><a href="#检测已访问的页面困难" class="toc-link">检测已访问的页面（困难）</a><ul class="toc-sublist"><li class="toc-item"><a href="#实验目标" class="toc-link">实验目标</a></li><li class="toc-item"><a href="#实验原理" class="toc-link">实验原理</a></li><li class="toc-item"><a href="#实现步骤" class="toc-link">实现步骤</a></li><li class="toc-item"><a href="#思考" class="toc-link">思考</a></li></ul></li>
             </ul>
           </nav>
         </aside>
